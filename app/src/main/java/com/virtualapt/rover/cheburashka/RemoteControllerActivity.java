@@ -21,22 +21,14 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.virtualapt.rover.cheburashka.Constants.*;
-
-import static com.virtualapt.rover.cheburashka.Constants.MSG_PUSHOUT_DATA;
-import static com.virtualapt.rover.cheburashka.Constants.MSG_REGISTER_ROVER_ACTIVITY;
-
 public class RemoteControllerActivity extends Activity{
 
     public static final String TAG = "RemoteControllerActivity";
-
-    MasterApplication mApp = null;
 
     private static final String DEVICE_NAME = "DEVICE_NAME";
 
@@ -74,8 +66,6 @@ public class RemoteControllerActivity extends Activity{
     TimerTask pingTimerTask;
     Timer pingTimer;
 
-    int nPing = 0;
-
     String jsString;
     JoyStickClass js;
     RelativeLayout layout_joystick;
@@ -100,10 +90,10 @@ public class RemoteControllerActivity extends Activity{
     private boolean showJSStats = false;
     private boolean showRxStats = false;
 
-    public int frontPingCM;
-    public int rightPingCM;
-    public int leftPingCM;
-    public int backPingCM;
+//    public int frontPingCM;
+//    public int rightPingCM;
+//    public int leftPingCM;
+//    public int backPingCM;
 
     private TextView jsData;
 
@@ -133,8 +123,6 @@ public class RemoteControllerActivity extends Activity{
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_remote_controller);
-
-        mApp = (MasterApplication)getApplication();
 
         bluetoothLogoView = (ImageView)findViewById(R.id.bluetoothLogoView);
         turnSensitivityText = (TextView) findViewById(R.id.turnSensitivityText);
@@ -630,7 +618,7 @@ public class RemoteControllerActivity extends Activity{
         private WeakReference<RemoteControllerActivity> mActivity;
 
         public BluetoothResponseHandler(RemoteControllerActivity activity) {
-            mActivity = new WeakReference<RemoteControllerActivity>(activity);
+            mActivity = new WeakReference<>(activity);
         }
 
         @Override
@@ -702,7 +690,7 @@ public class RemoteControllerActivity extends Activity{
 
         //stopTimer.schedule(stopTimerTask,(int)(time_desired*1000.0));
         sendMotionCommand((int)travelDistInTime((36+7.75)*2*Math.PI*(.25),2469),(int)travelDistInTime((36-7.75)*2*Math.PI*(.25),2469));
-        stopTimer.schedule(stopTimerTask,(int)(2469));
+        stopTimer.schedule(stopTimerTask, 2469);
         stopTimerTask = null;
     }
 
@@ -717,7 +705,7 @@ public class RemoteControllerActivity extends Activity{
 
         //stopTimer.schedule(stopTimerTask,(int)(time_desired*1000.0));
         sendMotionCommand((int)travelDistInTime((36-7.75)*2*Math.PI*(.25),2469),(int)travelDistInTime((36+7.75)*2*Math.PI*(.25),2469));
-        stopTimer.schedule(stopTimerTask,(int)(2469));
+        stopTimer.schedule(stopTimerTask, 2469);
         stopTimerTask = null;
     }
 
