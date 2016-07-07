@@ -1,0 +1,66 @@
+<resources>
+    <string name="app_name">VAPTRover</string>
+    <string name="enable_p2p_button">P2P On/Off</string>
+    <string name="discover_peers_button">Discover</string>
+    <string name="connect_peer_button">Connect</string>
+    <string name="disconnect_peer_button">Disconnect</string>
+    <string name="start_rover_activity">Start Rover</string>
+    <string name="start_RC_activity">Start RC</string>
+    <string name="empty"></string>
+    <string name="yes">yes</string>
+    <string name="no">no</string>
+    <string name="client_text">This device will act as a client. Click on Start Chatting button</string>
+    <string name="empty_message">No devices found. Turn on P2P and perform discovery from the Action Bar</string>
+    <string name="p2p_off_warning">Enable P2P from action bar button above or system settings</string>
+    <string name="group_owner_text">"Am I the Group Owner? "</string>
+    <string name="label_me">ME</string>
+    <string name="label_peers">PEERS</string>
+    <string name="disconnect">disconnect</string>
+    <string name="about">about</string>
+    <string name="help">help</string>
+    <string name="picture">Capture</string>
+    <string name="pref_commands_mode">pref_commands_mode</string>
+    <string name="pref_commands_ending">pref_commands_ending</string>
+    <string name="pref_log_timing">pref_log_timing</string>
+    <string name="pref_log_direction">pref_log_direction</string>
+    <string name="pref_need_clean">pref_need_clean</string>
+    <!-- prefence keys, no translation needed -->
+
+    <string name="msg_not_connected">not connected</string>
+    <string name="msg_connecting">connecting…</string>
+    <string name="msg_connected">connected</string>
+
+    <string name="action_bluetooth">on/off</string>
+    <string name="no_bt_support">Your device doesn\'t support bluetooth.</string>
+    <string name="empty_device_name">&lt;New device&gt;</string>
+
+    <string name="menu_send">Send log…</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_clear">Clear history</string>
+
+    <string name="select_device">Select device</string>
+    <string name="search_message">Search for devices…</string>
+    <string name="title_paired_devices">Paired devices</string>
+    <string name="title_other_devices">Other devices</string>
+    <string name="none_paired">No paired devices</string>
+    <string name="none_found">Not found</string>
+    <string name="command_hint">Enter command here</string>
+    <string name="button_send">Send</string>
+
+    <string name="log_settings_category">Command history:</string>
+
+    <string name="log_time">Time</string>
+    <string name="log_time_summary">Show time in log</string>
+    <string name="log_direction">Direction</string>
+    <string name="log_direction_summary">Show I/O direction in log</string>
+
+    <string name="commands_mode">Input mode:</string>
+    <string name="commands_mode_summary">Select input mode</string>
+    <string name="commands_ending_summary">Select ending</string>
+
+    <string name="need_clean">Clear previous command</string>
+    <string name="need_clean_summary">Cleanup command view after sending</string>
+
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+</resources>
