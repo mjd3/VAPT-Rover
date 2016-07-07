@@ -28,39 +28,12 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo">
         <activity
-            android:name=".WiFiDirectActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".RemoteControllerActivity"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".RoverActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name=".DeviceListActivity"
             android:screenOrientation="landscape" />
 
-        <receiver android:name=".WifiDirectBroadcastReceiver">
-            <intent-filter>
-                <action android:name="android.net.wifi.p2p.STATE_CHANGED" />
-                <action android:name="android.net.wifi.p2p.PEERS_CHANGED" />
-                <action android:name="android.net.wifi.p2p.THIS_DEVICE_CHANGED" />
-                <action android:name="android.net.wifi.p2p.CONNECTION_STATE_CHANGE" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name=".ConnectionService"
-            android:enabled="true" />
     </application>
 
 </manifest>

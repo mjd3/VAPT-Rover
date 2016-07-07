@@ -32,10 +32,6 @@ public class MasterApplication extends Application {
 
 	boolean mIsServer = false;
 	
-	WiFiDirectActivity mHomeActivity = null;
-	List<WifiP2pDevice> mPeers = new ArrayList<WifiP2pDevice>();  // update on every peers available
-
-
 	public enum DeviceRole {
 		ROVER,
 		REMOTE
@@ -46,51 +42,6 @@ public class MasterApplication extends Application {
         super.onCreate();
     }
 	
-	/**
-	 * whether p2p is enabled in this device. 
-	 * my bcast listener always gets enable/disable intent and persist to shared pref
-	 */
-	public boolean isP2pEnabled() {
-		String state = AppPreferences.getStringFromPref(this, AppPreferences.PREF_NAME, AppPreferences.P2P_ENABLED);
-		if ( state != null && "1".equals(state.trim())){
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-     * upon p2p connection available, group owner start server socket channel
-     * start socket server and select monitor the socket
-     */
-    public void startSocketServer() {
-    	Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
-    	msg.what = MSG_STARTSERVER;
-    	ConnectionService.getInstance().getHandler().sendMessage(msg);
-    }
-    
-    /**
-     * upon p2p connection available, non group owner start socket channel connect to group owner.
-     */
-    public void startSocketClient(String hostname) {
-    	Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
-    	msg.what = MSG_STARTCLIENT;
-    	msg.obj = hostname;
-    	ConnectionService.getInstance().getHandler().sendMessage(msg);
-    }
-    
-    /**
-     * check whether there exists a connected peer.
-     */
-    public WifiP2pDevice getConnectedPeer(){
-    	WifiP2pDevice peer = null;
-		for(WifiP2pDevice d : mPeers ){
-    		if( d.status == WifiP2pDevice.CONNECTED){
-    			peer = d;
-    		}
-    	}
-    	return peer;
-    }
-
     /**
      * get the intent to launch any activity (specifically the chat activity)
      */

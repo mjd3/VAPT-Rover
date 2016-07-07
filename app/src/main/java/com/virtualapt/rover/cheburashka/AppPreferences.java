@@ -11,17 +11,10 @@ public class AppPreferences {
     private static final String TAG = "PTP_Pref";
     
     public static final String PREF_NAME = Constants.PACKAGE_NAME;
-    
-    public static final String P2P_ENABLED = "p2pEnabled";
 
-    private MasterApplication mConnActivity;
     private SharedPreferences mPref;
 
-    public AppPreferences(MasterApplication app) {
-    	mConnActivity = app;
-        mPref = mConnActivity.getSharedPreferences(Constants.PACKAGE_NAME, 0);
-    }
-    /**
+   /**
      * Get the value of a key
      * @param key
      * @return

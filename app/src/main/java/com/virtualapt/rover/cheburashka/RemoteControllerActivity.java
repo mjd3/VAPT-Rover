@@ -1,12 +1,16 @@
 package com.virtualapt.rover.cheburashka;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Point;
+import android.app.FragmentTransaction;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.net.TrafficStats;
+import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -19,17 +23,59 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static com.virtualapt.rover.cheburashka.Constants.*;
+
+import static com.virtualapt.rover.cheburashka.Constants.MSG_PUSHOUT_DATA;
+import static com.virtualapt.rover.cheburashka.Constants.MSG_REGISTER_ROVER_ACTIVITY;
 
 public class RemoteControllerActivity extends Activity{
 
     public static final String TAG = "RemoteControllerActivity";
 
     MasterApplication mApp = null;
-    ImageView roverFeed;
+
+    private static final String DEVICE_NAME = "DEVICE_NAME";
+
+    // Intent request codes
+    static final int REQUEST_CONNECT_DEVICE = 1;
+    static final int REQUEST_ENABLE_BT = 2;
+
+    // Message types sent from the DeviceConnector Handler
+    public static final int MESSAGE_STATE_CHANGE = 1;
+    public static final int MESSAGE_READ = 2;
+    public static final int MESSAGE_WRITE = 3;
+    public static final int MESSAGE_DEVICE_NAME = 4;
+    public static final int MESSAGE_TOAST = 5;
+
+    BluetoothAdapter btAdapter;
+
+    private static final String SAVED_PENDING_REQUEST_ENABLE_BT = "PENDING_REQUEST_ENABLE_BT";
+    boolean pendingRequestEnableBt = false;
+
+    private static DeviceConnector connector;
+    private static BluetoothResponseHandler mHandler;
+
+    private String deviceName;
+
+    private ImageView bluetoothLogoView;
+
+    private TextView speedSensitivityText;
+    private TextView turnSensitivityText;
+    private SeekBar speedSeekBar;
+    private double speedSensitivity = 1;
+    private SeekBar turnSeekBar;
+
+    private Button connectButton;
+
+    TimerTask pingTimerTask;
+    Timer pingTimer;
+
+    int nPing = 0;
+
     String jsString;
     JoyStickClass js;
     RelativeLayout layout_joystick;
@@ -81,14 +127,91 @@ public class RemoteControllerActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_rover);
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_remote_controller);
 
-        roverFeed = (ImageView)findViewById(R.id.roverFeed);
-        roverFeed.setScaleType(ImageView.ScaleType.FIT_XY);
         mApp = (MasterApplication)getApplication();
+
+        bluetoothLogoView = (ImageView)findViewById(R.id.bluetoothLogoView);
+        turnSensitivityText = (TextView) findViewById(R.id.turnSensitivityText);
+        speedSensitivityText = (TextView) findViewById(R.id.speedSensitivityText);
+        speedSeekBar = (SeekBar)findViewById(R.id.speedSeekBar);
+        speedSeekBar.setProgress(50); //set it to the mid-value (scalara = 1.0 = 50/50)
+        turnSeekBar = (SeekBar)findViewById(R.id.turnSeekBar);
+        connectButton = (Button)findViewById(R.id.connectButton);
+
+        PreferenceManager.setDefaultValues(this, R.xml.settings_activity, false);
+
+        if (savedInstanceState != null) {
+            pendingRequestEnableBt = savedInstanceState.getBoolean(SAVED_PENDING_REQUEST_ENABLE_BT);
+        }
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (btAdapter == null) {
+            final String no_bluetooth ="BT unsupported on this device";
+            Utils.log(no_bluetooth);
+        }
+
+        if (btAdapter == null) return;
+        if (!btAdapter.isEnabled() && !pendingRequestEnableBt) {
+            pendingRequestEnableBt = true;
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+            Log.d("BT", "Setting up BT adapter");
+        }
+
+        if (mHandler == null) mHandler = new BluetoothResponseHandler(this);
+        //else mHandler.setTarget(this);
+
+        if (isConnected() && (savedInstanceState != null)) {
+            setDeviceName(savedInstanceState.getString(DEVICE_NAME));
+        } else
+            Log.d("BT", "MSG_NOT_CONNECTED");
+        //getSupportActionBar().setSubtitle(MSG_NOT_CONNECTED);
+
+        connectButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                startDeviceListActivity();
+            }
+        });
+
+        jsData = (TextView)findViewById(R.id.jsData);
+
+        turnSensitivityText.setText("CURRENTLY DISABLED");
+
+        speedSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                speedSensitivityText.setText("Speed sensitivity: " + ((double)progress)/50.0);
+                speedSensitivity = progress/50.0;
+            }
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        turnSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                //turnSensitivityText.setText("Turn sensitivity: " + progress);
+                //turnSensitivityText.setText("CURRENTLY DISABLED");
+                //turnSensitivity = progress/100.0;
+            }
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+
+        final FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.commit();
+
 
         //degreesLeft = (Button) findViewById(R.id.degrees_left_90);
         //degreesRight = (Button) findViewById(R.id.degrees_right_90);
@@ -110,10 +233,6 @@ public class RemoteControllerActivity extends Activity{
         //degreesLeft.setText("90");
         //degreesRight.setText("90");
         stopTimer = new Timer();
-
-
-
-
 
         lWheel_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
@@ -154,14 +273,14 @@ public class RemoteControllerActivity extends Activity{
                 stopTimerTask = new TimerTask(){
                     @Override
                     public void run() {
-                        pushOutSpeedCommand(0,0);
+                        sendMotionCommand(0,0);
                         curve1();
                     }
                 };
-                //pushOutSpeedCommand(lWheelSpeed,rWheelSpeed);
+                //sendMotionCommand(lWheelSpeed,rWheelSpeed);
 
                 //stopTimer.schedule(stopTimerTask,(int)(time_desired*1000.0));
-                pushOutSpeedCommand((int)travelDistInTime(36,2000),(int)travelDistInTime(36,2000));
+                sendMotionCommand((int)travelDistInTime(36,2000),(int)travelDistInTime(36,2000));
                 stopTimer.schedule(stopTimerTask,(int)(2*1000.0));
                 stopTimerTask = null;
             }
@@ -197,7 +316,7 @@ public class RemoteControllerActivity extends Activity{
                     */
                 }
                 if(event.getAction() == MotionEvent.ACTION_UP) {
-                    pushOutSpeedCommand(0,0);
+                    sendMotionCommand(0,0);
                     //if(event.getX() > 0 && event.getX() < 280 && event.getY() < 0 && event.getY() > -280){
                     //    degreesLeft.setPressed(false);
                     //}
@@ -225,7 +344,7 @@ public class RemoteControllerActivity extends Activity{
                     }
                 }
                 if(event.getAction() == MotionEvent.ACTION_UP) {
-                    pushOutSpeedCommand(0,0);
+                    sendMotionCommand(0,0);
                 }
                 return false;
             }
@@ -234,7 +353,7 @@ public class RemoteControllerActivity extends Activity{
         stopButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                pushOutSpeedCommand(0,0);
+                sendMotionCommand(0,0);
             }
         });
 
@@ -305,9 +424,9 @@ public class RemoteControllerActivity extends Activity{
                             jsString = jsString.concat("Distance : " + String.valueOf(js.getDistance()) + "\n");
                             jsData.setText(jsString);
                         }
-                        pushOutSpeedCommand(0,0);
+                        sendMotionCommand(0,0);
                 } else if(arg1.getAction() == MotionEvent.ACTION_CANCEL){
-                        pushOutSpeedCommand(0,0);
+                        sendMotionCommand(0,0);
                     }
                 return true;
             }
@@ -317,29 +436,35 @@ public class RemoteControllerActivity extends Activity{
     @Override
     protected void onResume() {
         super.onResume();
-        registerActivityToService(true);
     }
 
-    protected void registerActivityToService(boolean register){
-        if( ConnectionService.getInstance() != null ){
-            Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
-            msg.what = MSG_REGISTER_RC_ACTIVITY;
-            msg.obj = this;
-            msg.arg1 = register ? 1 : 0;
-            ConnectionService.getInstance().getHandler().sendMessage(msg);
-        }
+    boolean isAdapterReady() {
+        return (btAdapter != null) && (btAdapter.isEnabled());
+    }
+
+    public void showJSData(final int x, final int y){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String jsString;
+                jsString = "X : ";
+                jsString = jsString.concat(String.valueOf(x) + "\n");
+                jsString = jsString.concat("Y : " + String.valueOf(y) + "\n");
+                jsData.setText(jsString);
+            }
+        });
     }
 
     private void rotateLeftButton2Command(int init, int last){
         if(init - last > 0){
             //reduce senistivity a bit
-            pushOutSpeedCommand((int)(-0.2*(init - last)),(int)(0.2*(init - last)));
+            sendMotionCommand((int)(-0.2*(init - last)),(int)(0.2*(init - last)));
         }
     }
     private void rotateRightButton2Command(int init, int last){
         if(init - last > 0){
             //reduce senistivity a bit
-            pushOutSpeedCommand((int)(0.2*(init - last)),(int)(-0.2*(init - last)));
+            sendMotionCommand((int)(0.2*(init - last)),(int)(-0.2*(init - last)));
         }
     }
     public void jsCoords2MotionCommand(JoyStickClass js) {
@@ -380,19 +505,177 @@ public class RemoteControllerActivity extends Activity{
 
         jsData.setText("lWheelSpeed: " + lWheelSpeed + " rWheelSpeed: " + rWheelSpeed);
         //jsData.setText("Front: " + frontPingCM + "\nLeft: " + leftPingCM + "\nRight: " + rightPingCM + "\nBack: " + backPingCM);
-        pushOutSpeedCommand(lWheelSpeed,rWheelSpeed);
+        sendMotionCommand(lWheelSpeed,rWheelSpeed);
     }
 
-    //the command should be composed of 8 bytes: 4 for X direction, 4 for Y direction integers
-    public void pushOutSpeedCommand(int lWheel, int rWheel) {
-        byte[] command = new byte[8];
-        System.arraycopy(toBytes(lWheel),0,command,0,4);
-        System.arraycopy(toBytes(rWheel),0,command,4,4);
-        Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
-        msg.what = MSG_PUSHOUT_DATA;
-        msg.obj = command;
-        msg.arg1 = 1;
-        ConnectionService.getInstance().getHandler().sendMessage(msg);
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_PENDING_REQUEST_ENABLE_BT, pendingRequestEnableBt);
+        outState.putString(DEVICE_NAME, deviceName);
+    }
+
+    private boolean isConnected() {
+        return (connector != null) && (connector.getState() == DeviceConnector.STATE_CONNECTED);
+    }
+
+    private void stopConnection() {
+        if (connector != null) {
+            connector.stop();
+            connector = null;
+            deviceName = null;
+        }
+    }
+
+    private void startDeviceListActivity() {
+        if(Debug.DEBUG)
+            Log.d("BT", "startDeviceListActivity: entered");
+        stopConnection();
+        Intent serverIntent = new Intent(this, DeviceListActivity.class);
+        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_CONNECT_DEVICE:
+                // When DeviceListActivity returns with a device to connect
+                if (resultCode == Activity.RESULT_OK) {
+                    String address = data.getStringExtra(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+                    BluetoothDevice device = btAdapter.getRemoteDevice(address);
+                    if (isAdapterReady() && (connector == null))
+                        setupConnector(device);
+                }
+                break;
+            case REQUEST_ENABLE_BT:
+                // When the request to enable Bluetooth returns
+                pendingRequestEnableBt = false;
+                if (resultCode != Activity.RESULT_OK) {
+                    Utils.log("BT not enabled");
+                }
+                break;
+        }
+    }
+
+    private void setupConnector(BluetoothDevice connectedDevice) {
+        stopConnection();
+        try {
+            String emptyName = getString(R.string.empty_device_name);
+            DeviceData data = new DeviceData(connectedDevice, emptyName);
+            connector = new DeviceConnector(data, mHandler);
+            connector.connect();
+        } catch (IllegalArgumentException e) {
+            Utils.log("setupConnector failed: " + e.getMessage());
+        }
+    }
+
+    public void sendCommand(View view) {
+        byte[] command = null;
+        if (isConnected()) {
+            connector.write(command);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        final String mode = Utils.getPrefence(this, getString(R.string.pref_commands_mode));
+    }
+
+    public void sendMotionCommand(int lWheel, int rWheel) {
+
+        //sensitivity multiplier from 0 to 2 from seekbar
+        //lWheel *= speedSensitivity;
+        //rWheel *= speedSensitivity;
+
+        int MAX = 600, MIN = -600;
+        //bad things will happen if these are not set immediately before sending the command
+        if(lWheel > MAX)
+            lWheel = MAX;
+        if(lWheel < MIN)
+            lWheel = MIN;
+        if(rWheel > MAX)
+            rWheel = MAX;
+        if(rWheel < MIN)
+            rWheel = MIN;
+        final int drWheel = rWheel;
+        final int dlWheel = lWheel;
+
+        if(Debug.DEBUG) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String jsString = (String) jsData.getText();
+                    jsString = jsString.concat("\nRWheel: " + drWheel + "LWheel: " + dlWheel);
+                    jsData.setText(jsString);
+                }
+            });
+        }
+
+        if (isConnected()) {
+            //mesage consists of a header: VAPT0001, followed immediately by the dhb10_com input string and termination character
+            byte[] command = String.format("VAPT0001GOSPD %d %d\r",lWheel,rWheel).getBytes();
+            connector.write(command);
+        }
+    }
+
+    void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+        //getSupportActionBar().setSubtitle(deviceName);
+    }
+
+    private class BluetoothResponseHandler extends Handler {
+        private WeakReference<RemoteControllerActivity> mActivity;
+
+        public BluetoothResponseHandler(RemoteControllerActivity activity) {
+            mActivity = new WeakReference<RemoteControllerActivity>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            RemoteControllerActivity activity = mActivity.get();
+            if (activity != null) {
+                switch (msg.what) {
+                    case MESSAGE_STATE_CHANGE:
+                        Utils.log("MESSAGE_STATE_CHANGE: " + msg.arg1);
+                        //final ActionBar bar = activity.getSupportActionBar();
+                        switch (msg.arg1) {
+                            case DeviceConnector.STATE_CONNECTED:
+                                bluetoothLogoView.setVisibility(View.VISIBLE);
+                                pingTimer.scheduleAtFixedRate(pingTimerTask, 0, 250);
+                                //bar.setSubtitle(MSG_CONNECTED);
+                                break;
+                            case DeviceConnector.STATE_CONNECTING:
+                                //bar.setSubtitle(MSG_CONNECTING);
+                                break;
+                            case DeviceConnector.STATE_NONE:
+                                //bar.setSubtitle(MSG_NOT_CONNECTED);
+                                break;
+                            case DeviceConnector.STATE_DISCONNECTED:
+                                bluetoothLogoView.setVisibility(View.GONE);
+                                break;
+                        }
+                        break;
+
+                    case MESSAGE_READ:
+                        break;
+
+                    case MESSAGE_DEVICE_NAME:
+                        activity.setDeviceName((String) msg.obj);
+                        break;
+
+                    case MESSAGE_WRITE:
+                        // stub
+                        break;
+
+                    case MESSAGE_TOAST:
+                        // stub
+                        break;
+                }
+            }
+        }
     }
 
     byte[] toBytes(int i)
@@ -407,28 +690,18 @@ public class RemoteControllerActivity extends Activity{
         return result;
     }
 
-    public void showImage(final byte[] data) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                roverFeed.setImageBitmap(bitmap);
-            }
-        });
-    }
-
     void curve1(){
         stopTimerTask = new TimerTask(){
             @Override
             public void run() {
-                pushOutSpeedCommand(0,0);
+                sendMotionCommand(0,0);
                 curve2();
             }
         };
-        //pushOutSpeedCommand(lWheelSpeed,rWheelSpeed);
+        //sendMotionCommand(lWheelSpeed,rWheelSpeed);
 
         //stopTimer.schedule(stopTimerTask,(int)(time_desired*1000.0));
-        pushOutSpeedCommand((int)travelDistInTime((36+7.75)*2*Math.PI*(.25),2469),(int)travelDistInTime((36-7.75)*2*Math.PI*(.25),2469));
+        sendMotionCommand((int)travelDistInTime((36+7.75)*2*Math.PI*(.25),2469),(int)travelDistInTime((36-7.75)*2*Math.PI*(.25),2469));
         stopTimer.schedule(stopTimerTask,(int)(2469));
         stopTimerTask = null;
     }
@@ -437,13 +710,13 @@ public class RemoteControllerActivity extends Activity{
         stopTimerTask = new TimerTask(){
             @Override
             public void run() {
-                pushOutSpeedCommand(0,0);
+                sendMotionCommand(0,0);
             }
         };
-        //pushOutSpeedCommand(lWheelSpeed,rWheelSpeed);
+        //sendMotionCommand(lWheelSpeed,rWheelSpeed);
 
         //stopTimer.schedule(stopTimerTask,(int)(time_desired*1000.0));
-        pushOutSpeedCommand((int)travelDistInTime((36-7.75)*2*Math.PI*(.25),2469),(int)travelDistInTime((36+7.75)*2*Math.PI*(.25),2469));
+        sendMotionCommand((int)travelDistInTime((36-7.75)*2*Math.PI*(.25),2469),(int)travelDistInTime((36+7.75)*2*Math.PI*(.25),2469));
         stopTimer.schedule(stopTimerTask,(int)(2469));
         stopTimerTask = null;
     }
