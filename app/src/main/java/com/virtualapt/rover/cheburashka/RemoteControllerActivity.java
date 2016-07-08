@@ -66,6 +66,7 @@ public class RemoteControllerActivity extends Activity{
 
     TimerTask pingTimerTask;
     Timer pingTimer;
+    int nPing = 0;
 
     String jsString;
     JoyStickClass js;
@@ -132,7 +133,14 @@ public class RemoteControllerActivity extends Activity{
         turnSeekBar = (SeekBar)findViewById(R.id.turnSeekBar);
         connectButton = (Button)findViewById(R.id.connectButton);
 
-//        PreferenceManager.setDefaultValues(this, R.xml.settings_activity, false);
+        pingTimer = new Timer();
+
+        pingTimerTask = new TimerTask(){
+            @Override
+            public void run() {
+                startPingProcess();
+            }
+        };
 
         if (savedInstanceState != null) {
             pendingRequestEnableBt = savedInstanceState.getBoolean(SAVED_PENDING_REQUEST_ENABLE_BT);
@@ -430,6 +438,25 @@ public class RemoteControllerActivity extends Activity{
         return (btAdapter != null) && (btAdapter.isEnabled());
     }
 
+    void startPingProcess(){
+        //send the rover a ping every N milliseconds, if the rover doesn't receive this ping within a set time, it disables the motors
+        if (isConnected()) {
+            //mesage consists of a header: VAPT0002, that's all is needed for this message header
+            byte[] command = String.format("VAPT0002\r").getBytes();
+            connector.write(command);
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    jsData.setText("SENT #:" + nPing++);
+                }
+            });
+
+        }else{
+            Toast.makeText(this,"Error, ping attempted but BT not connected",Toast.LENGTH_SHORT);
+        }
+    }
+
     public void showJSData(final int x, final int y){
         runOnUiThread(new Runnable() {
             @Override
@@ -618,7 +645,7 @@ public class RemoteControllerActivity extends Activity{
         private WeakReference<RemoteControllerActivity> mActivity;
 
         public BluetoothResponseHandler(RemoteControllerActivity activity) {
-            mActivity = new WeakReference<>(activity);
+            mActivity = new WeakReference<RemoteControllerActivity>(activity);
         }
 
         @Override
@@ -632,6 +659,7 @@ public class RemoteControllerActivity extends Activity{
                         switch (msg.arg1) {
                             case DeviceConnector.STATE_CONNECTED:
                                 bluetoothLogoView.setVisibility(View.VISIBLE);
+                                connectButton.setText(R.string.disconnect_button);
                                 pingTimer.scheduleAtFixedRate(pingTimerTask, 0, 250);
                                 //bar.setSubtitle(MSG_CONNECTED);
                                 break;
