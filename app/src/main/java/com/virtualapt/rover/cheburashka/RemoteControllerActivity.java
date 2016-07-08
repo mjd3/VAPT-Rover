@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 import java.util.Timer;
@@ -117,7 +118,6 @@ public class RemoteControllerActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_rover);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -132,7 +132,7 @@ public class RemoteControllerActivity extends Activity{
         turnSeekBar = (SeekBar)findViewById(R.id.turnSeekBar);
         connectButton = (Button)findViewById(R.id.connectButton);
 
-        PreferenceManager.setDefaultValues(this, R.xml.settings_activity, false);
+//        PreferenceManager.setDefaultValues(this, R.xml.settings_activity, false);
 
         if (savedInstanceState != null) {
             pendingRequestEnableBt = savedInstanceState.getBoolean(SAVED_PENDING_REQUEST_ENABLE_BT);

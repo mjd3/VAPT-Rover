@@ -14,7 +14,7 @@ import java.io.OutputStream;
 
 public class DeviceConnector {
     private static final String TAG = "DeviceConnector";
-    private static final boolean D = false;
+    private static final boolean D = true;
 
     // Current connection state constants
     public static final int STATE_NONE = 0;       // we're doing nothing

@@ -6,22 +6,32 @@
     android:id="@+id/mainLayout"
     tools:context="com.virtualapt.rover.cheburashka.RemoteControllerActivity">
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/roverFeed"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
-
     <RelativeLayout
         android:id="@+id/layout_joystick"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:background="@drawable/image_button_bg"
-        android:layout_marginEnd="80dp"
+        android:layout_marginEnd="50dp"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true">
     </RelativeLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:singleLine="true"
+        android:text="@string/connect_button"
+        android:id="@+id/connectButton"
+        android:layout_alignParentEnd="true" />
+
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:id="@+id/bluetoothLogoView"
+        android:src="@mipmap/bluetooth_logo"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/connectButton"
+        android:visibility="gone"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -90,12 +100,26 @@
             android:src="@drawable/rotate_right_arrow" />
     </LinearLayout>
 </LinearLayout>
+    <SeekBar
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/speedSeekBar"
+        android:layout_below="@+id/connectButton"
+        android:indeterminate="false" />
+
+    <SeekBar
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/turnSeekBar"
+        android:layout_below="@+id/speedSeekBar"
+        android:layout_alignStart="@+id/speedSeekBar"
+        android:indeterminate="false" />
 
     <SeekBar
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:id="@+id/lWheelSeekBar"
-        android:layout_above="@+id/layout_joystick"
+        android:layout_below="@+id/turnSeekBar"
         android:layout_alignParentStart="true"
         android:indeterminate="false" />
 
@@ -117,7 +141,25 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Speed sensitivity"
+        android:id="@+id/speedSensitivityText"
+        android:layout_above="@+id/turnSeekBar"
+        android:layout_alignStart="@+id/turnSensitivityText" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Turn sensitivity"
+        android:id="@+id/turnSensitivityText"
+        android:layout_alignBottom="@+id/turnSeekBar"
+        android:layout_toEndOf="@+id/turnSeekBar" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Left Wheel"
         android:id="@+id/textView"
         android:layout_above="@+id/rWheelSeekBar"
         android:layout_toEndOf="@+id/rWheelSeekBar" />
@@ -125,7 +167,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:text="Right Wheel"
         android:id="@+id/textView2"
         android:layout_above="@+id/t_SeekBar"
         android:layout_toEndOf="@+id/rWheelSeekBar" />
@@ -133,7 +175,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:text="Action Time"
         android:id="@+id/textView3"
         android:layout_alignBottom="@+id/t_SeekBar"
         android:layout_toEndOf="@+id/t_SeekBar" />

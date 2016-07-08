@@ -1,17 +1,13 @@
 <resources>
     <string name="app_name">VAPTRover</string>
-    <string name="enable_p2p_button">P2P On/Off</string>
-    <string name="discover_peers_button">Discover</string>
-    <string name="connect_peer_button">Connect</string>
-    <string name="disconnect_peer_button">Disconnect</string>
-    <string name="start_rover_activity">Start Rover</string>
+    <string name="connect_button">Connect</string>
+    <string name="disconnect_button">Disconnect</string>
     <string name="start_RC_activity">Start RC</string>
     <string name="empty"></string>
     <string name="yes">yes</string>
     <string name="no">no</string>
     <string name="client_text">This device will act as a client. Click on Start Chatting button</string>
     <string name="empty_message">No devices found. Turn on P2P and perform discovery from the Action Bar</string>
-    <string name="p2p_off_warning">Enable P2P from action bar button above or system settings</string>
     <string name="group_owner_text">"Am I the Group Owner? "</string>
     <string name="label_me">ME</string>
     <string name="label_peers">PEERS</string>
@@ -61,6 +57,4 @@
     <string name="need_clean">Clear previous command</string>
     <string name="need_clean_summary">Cleanup command view after sending</string>
 
-    <string name="request_permission">This sample needs camera permission.</string>
-    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
 </resources>
