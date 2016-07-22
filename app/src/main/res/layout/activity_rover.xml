@@ -51,7 +51,7 @@
     <SeekBar
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:id="@+id/speedSeekBar"
+        android:id="@+id/kp_angle_seekBar"
         android:layout_below="@+id/connectButton"
         android:layout_alignEnd="@+id/frag_cam"
         android:indeterminate="false" />
@@ -59,9 +59,9 @@
     <SeekBar
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:id="@+id/turnSeekBar"
-        android:layout_below="@+id/speedSeekBar"
-        android:layout_alignStart="@+id/speedSeekBar"
+        android:id="@+id/ki_angle_seekBar"
+        android:layout_below="@+id/kp_angle_seekBar"
+        android:layout_alignStart="@+id/kp_angle_seekBar"
         android:indeterminate="false" />
 
     <TextView
@@ -70,16 +70,16 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Speed sensitivity"
         android:id="@+id/speedSensitivityText"
-        android:layout_above="@+id/turnSeekBar"
-        android:layout_alignStart="@+id/turnSensitivityText" />
+        android:layout_above="@+id/ki_angle_seekBar"
+        android:layout_alignStart="@+id/ki_angle_textView" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Turn sensitivity"
-        android:id="@+id/turnSensitivityText"
-        android:layout_alignBottom="@+id/turnSeekBar"
+        android:id="@+id/ki_angle_textView"
+        android:layout_alignBottom="@+id/ki_angle_seekBar"
         android:layout_toStartOf="@+id/connectButton" />
 
 </RelativeLayout>

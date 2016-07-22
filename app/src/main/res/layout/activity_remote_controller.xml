@@ -103,31 +103,31 @@
     <SeekBar
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:id="@+id/speedSeekBar"
+        android:id="@+id/kp_angle_seekBar"
         android:layout_below="@+id/connectButton"
         android:indeterminate="false" />
 
     <SeekBar
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:id="@+id/turnSeekBar"
-        android:layout_below="@+id/speedSeekBar"
-        android:layout_alignStart="@+id/speedSeekBar"
+        android:id="@+id/ki_angle_seekBar"
+        android:layout_below="@+id/kp_angle_seekBar"
+        android:layout_alignStart="@+id/kp_angle_seekBar"
         android:indeterminate="false" />
 
     <SeekBar
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:id="@+id/lWheelSeekBar"
-        android:layout_below="@+id/turnSeekBar"
+        android:id="@+id/kp_dist_seekBar"
+        android:layout_below="@+id/ki_angle_seekBar"
         android:layout_alignParentStart="true"
         android:indeterminate="false" />
 
     <SeekBar
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:id="@+id/rWheelSeekBar"
-        android:layout_below="@+id/lWheelSeekBar"
+        android:id="@+id/ki_dist_seekBar"
+        android:layout_below="@+id/kp_dist_seekBar"
         android:layout_alignParentStart="true"
         android:indeterminate="false" />
 
@@ -135,42 +135,42 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:id="@+id/t_SeekBar"
-        android:layout_below="@+id/rWheelSeekBar"
+        android:layout_below="@+id/ki_dist_seekBar"
         android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Speed sensitivity"
-        android:id="@+id/speedSensitivityText"
-        android:layout_above="@+id/turnSeekBar"
-        android:layout_alignStart="@+id/turnSensitivityText" />
+        android:text="kp_angle"
+        android:id="@+id/kp_angle_textView"
+        android:layout_above="@+id/ki_angle_seekBar"
+        android:layout_alignStart="@+id/ki_angle_textView" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Turn sensitivity"
-        android:id="@+id/turnSensitivityText"
-        android:layout_alignBottom="@+id/turnSeekBar"
-        android:layout_toEndOf="@+id/turnSeekBar" />
+        android:text="ki_angle"
+        android:id="@+id/ki_angle_textView"
+        android:layout_alignBottom="@+id/ki_angle_seekBar"
+        android:layout_toEndOf="@+id/ki_angle_seekBar" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Left Wheel"
-        android:id="@+id/textView"
-        android:layout_above="@+id/rWheelSeekBar"
-        android:layout_toEndOf="@+id/rWheelSeekBar" />
+        android:text="kp_dist"
+        android:id="@+id/kp_dist_textView"
+        android:layout_above="@+id/ki_dist_seekBar"
+        android:layout_toEndOf="@+id/ki_dist_seekBar" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Right Wheel"
-        android:id="@+id/textView2"
+        android:text="ki_dist"
+        android:id="@+id/ki_dist_textView"
         android:layout_above="@+id/t_SeekBar"
-        android:layout_toEndOf="@+id/rWheelSeekBar" />
+        android:layout_toEndOf="@+id/ki_dist_seekBar" />
 
     <TextView
         android:layout_width="wrap_content"

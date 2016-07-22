@@ -9,7 +9,6 @@ import android.net.TrafficStats;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -56,8 +55,18 @@ public class RemoteControllerActivity extends Activity{
 
     private ImageView bluetoothLogoView;
 
-    private TextView speedSensitivityText;
-    private TextView turnSensitivityText;
+    private char kp_angle = 0, ki_angle = 0, kp_dist = 0, ki_dist = 0;
+
+    private TextView ki_angle_textView;
+    private TextView kp_angle_textView;
+    private TextView ki_dist_textView;
+    private TextView kp_dist_textView;
+
+    private SeekBar kp_angle_seekBar;
+    private SeekBar ki_angle_seekBar;
+    private SeekBar kp_dist_seekBar;
+    private SeekBar ki_dist_seekBar;
+
     private SeekBar speedSeekBar;
     private double speedSensitivity = 1;
     private SeekBar turnSeekBar;
@@ -92,15 +101,8 @@ public class RemoteControllerActivity extends Activity{
     private boolean showJSStats = false;
     private boolean showRxStats = false;
 
-//    public int frontPingCM;
-//    public int rightPingCM;
-//    public int leftPingCM;
-//    public int backPingCM;
-
     private TextView jsData;
 
-    private SeekBar lWheel_seekBar;
-    private SeekBar rWheel_seekBar;
     private SeekBar t_seekBar;
 
     private int lWheelSpeed;
@@ -126,11 +128,19 @@ public class RemoteControllerActivity extends Activity{
         setContentView(R.layout.activity_remote_controller);
 
         bluetoothLogoView = (ImageView)findViewById(R.id.bluetoothLogoView);
-        turnSensitivityText = (TextView) findViewById(R.id.turnSensitivityText);
-        speedSensitivityText = (TextView) findViewById(R.id.speedSensitivityText);
-        speedSeekBar = (SeekBar)findViewById(R.id.speedSeekBar);
-        speedSeekBar.setProgress(50); //set it to the mid-value (scalara = 1.0 = 50/50)
-        turnSeekBar = (SeekBar)findViewById(R.id.turnSeekBar);
+
+        kp_angle_textView = (TextView) findViewById(R.id.kp_angle_textView);
+        kp_angle_seekBar = (SeekBar)findViewById(R.id.kp_angle_seekBar);
+
+        ki_angle_textView = (TextView) findViewById(R.id.ki_angle_textView);
+        ki_angle_seekBar = (SeekBar)findViewById(R.id.ki_angle_seekBar);
+
+        kp_dist_textView = (TextView) findViewById(R.id.kp_dist_textView);
+        kp_dist_seekBar = (SeekBar)findViewById(R.id.kp_dist_seekBar);
+
+        ki_dist_textView = (TextView) findViewById(R.id.ki_dist_textView);
+        ki_dist_seekBar = (SeekBar)findViewById(R.id.ki_dist_seekBar);
+
         connectButton = (Button)findViewById(R.id.connectButton);
 
         pingTimer = new Timer();
@@ -177,8 +187,124 @@ public class RemoteControllerActivity extends Activity{
 
         jsData = (TextView)findViewById(R.id.jsData);
 
-        turnSensitivityText.setText("CURRENTLY DISABLED");
+        kp_angle_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
 
+                kp_angle = (char)(progress);
+                kp_angle_textView.setText("kp_angle: " + (int)kp_angle);
+
+                String str = new String("VAPT0003");// + kp_angle + ki_angle + kp_dist + ki_dist + '\r');
+
+                byte[] command = str.getBytes();
+
+                byte [] c= new byte[command.length+5];
+                for(int i=0;i<command.length;i++){
+                    c[i]=command[i];
+                }
+                c[command.length] = (byte)kp_angle;
+                c[command.length+1] = (byte)ki_angle;
+                c[command.length+2] = (byte)kp_dist;
+                c[command.length+3] = (byte)ki_dist;
+                c[command.length+4] = (byte)'\r';
+
+                String strs = new String(c);
+
+                ki_angle_textView.setText(strs);
+
+                connector.write(c);
+            }
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        ki_angle_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+
+                ki_angle = (char)(progress);
+                ki_angle_textView.setText("ki_angle: " + (int)ki_angle);
+
+                String str = new String("VAPT0003");
+
+                byte[] command = str.getBytes();
+
+                byte [] c= new byte[command.length+5];
+                for(int i=0;i<command.length;i++){
+                    c[i]=command[i];
+                }
+                c[command.length] = (byte)kp_angle;
+                c[command.length+1] = (byte)ki_angle;
+                c[command.length+2] = (byte)kp_dist;
+                c[command.length+3] = (byte)ki_dist;
+                c[command.length+4] = (byte)'\r';
+
+                connector.write(c);
+            }
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        kp_dist_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+
+                kp_dist = (char)(progress);
+                kp_dist_textView.setText("kp_dist: " + kp_dist);
+
+                String str = new String("VAPT0003");
+
+                byte[] command = str.getBytes();
+
+                byte [] c= new byte[command.length+5];
+                for(int i=0;i<command.length;i++){
+                    c[i]=command[i];
+                }
+                c[command.length] = (byte)kp_angle;
+                c[command.length+1] = (byte)ki_angle;
+                c[command.length+2] = (byte)kp_dist;
+                c[command.length+3] = (byte)ki_dist;
+                c[command.length+4] = (byte)'\r';
+
+                connector.write(c);
+            }
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        ki_dist_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+
+
+                ki_dist = (char)(progress);
+                ki_dist_textView.setText("ki_dist: " + ki_dist);
+
+                String str = new String("VAPT0003");
+
+                byte[] command = str.getBytes();
+
+                byte [] c= new byte[command.length+5];
+                for(int i=0;i<command.length;i++){
+                    c[i]=command[i];
+                }
+                c[command.length] = (byte)kp_angle;
+                c[command.length+1] = (byte)ki_angle;
+                c[command.length+2] = (byte)kp_dist;
+                c[command.length+3] = (byte)ki_dist;
+                c[command.length+4] = (byte)'\r';
+
+                connector.write(c);
+            }
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+/*
         speedSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
                 speedSensitivityText.setText("Speed sensitivity: " + ((double)progress)/50.0);
@@ -189,7 +315,8 @@ public class RemoteControllerActivity extends Activity{
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-
+        */
+/*
         turnSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
@@ -202,7 +329,7 @@ public class RemoteControllerActivity extends Activity{
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-
+*/
 
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
@@ -216,12 +343,12 @@ public class RemoteControllerActivity extends Activity{
 
         stopButton = (ImageButton)findViewById(R.id.stop_button);
 
-        lWheel_seekBar = (SeekBar)findViewById(R.id.lWheelSeekBar);
-        rWheel_seekBar = (SeekBar)findViewById(R.id.rWheelSeekBar);
+        //lWheel_seekBar = (SeekBar)findViewById(R.id.kp_dist_seekBar);
+        //rWheel_seekBar = (SeekBar)findViewById(R.id.ki_dist_seekBar);
         t_seekBar = (SeekBar)findViewById(R.id.t_SeekBar);
 
-        lWheel_label = (TextView)findViewById(R.id.textView);
-        rWheel_label = (TextView)findViewById(R.id.textView2);
+        //lWheel_label = (TextView)findViewById(R.id.textView);
+        //rWheel_label = (TextView)findViewById(R.id.textView2);
         t_desired_label = (TextView)findViewById(R.id.textView3);
 
         sendCommandButton = (Button)findViewById(R.id.commandButton);
@@ -229,7 +356,7 @@ public class RemoteControllerActivity extends Activity{
         //degreesLeft.setText("90");
         //degreesRight.setText("90");
         stopTimer = new Timer();
-
+/*
         lWheel_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
                 lWheelSpeed = (int)((progress - 50)*3);
@@ -251,7 +378,7 @@ public class RemoteControllerActivity extends Activity{
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-
+*/
         t_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
                 time_desired = (((double)progress)/(double)25.0) + 2.0;
@@ -349,7 +476,13 @@ public class RemoteControllerActivity extends Activity{
         stopButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                sendMotionCommand(0,0);
+                String str = new String("VAPT0004\r");
+
+                byte[] command = str.getBytes();
+
+                connector.write(command);
+
+                //sendMotionCommand(0,0);
             }
         });
 
@@ -671,6 +804,7 @@ public class RemoteControllerActivity extends Activity{
                                 break;
                             case DeviceConnector.STATE_DISCONNECTED:
                                 bluetoothLogoView.setVisibility(View.GONE);
+                                connectButton.setText(R.string.connect_button);
                                 break;
                         }
                         break;
