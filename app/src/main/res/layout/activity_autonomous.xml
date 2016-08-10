@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/autoLayout"
+    tools:context="com.virtualapt.rover.cheburashka.AutonomousActivity">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:singleLine="true"
+        android:text="@string/connect_button"
+        android:id="@+id/connectButton"
+        android:layout_alignParentEnd="true" />
+
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:id="@+id/bluetoothLogoView"
+        android:src="@mipmap/bluetooth_logo"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/connectButton"
+        android:visibility="gone"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No data..."
+        android:id="@+id/BTPingData"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Command:"
+        android:id="@+id/commandData"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/autonomous_label"
+        android:id="@+id/autonomousActivity_label"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:singleLine="true"
+        android:text="@string/switch_button"
+        android:id="@+id/switchButton"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"/>
+
+    <ImageButton
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:id="@+id/stop_button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/stop_sign"
+        android:layout_gravity="bottom" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/connectButton"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:id="@+id/settingsLayout">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/angleLayout">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="75dp"
+                android:layout_marginRight="75dp"
+                android:layout_marginBottom="20dp"
+                android:id="@+id/angleSettingsHeader"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Angle Settings"/>
+
+            <SeekBar
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/kp_angle_seekBar"
+                android:layout_marginBottom="10dp"
+                android:layout_below="@+id/angleSettingsHeader"
+                android:indeterminate="false" />
+
+            <SeekBar
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/ki_angle_seekBar"
+                android:layout_below="@+id/kp_angle_seekBar"
+                android:layout_alignStart="@+id/kp_angle_seekBar"
+                android:indeterminate="false" />
+
+            <SeekBar
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/kd_angle_seekBar"
+                android:layout_below="@+id/ki_angle_seekBar"
+                android:layout_marginTop="10dp"
+                android:layout_alignStart="@+id/ki_angle_seekBar"
+                android:indeterminate="false" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="kp_angle: 0"
+                android:id="@+id/kp_angle_textView"
+                android:layout_toEndOf="@+id/kp_angle_seekBar"
+                android:layout_alignBottom="@+id/kp_angle_seekBar"
+                android:layout_marginBottom="6dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="ki_angle: 0"
+                android:id="@+id/ki_angle_textView"
+                android:layout_toEndOf="@+id/ki_angle_seekBar"
+                android:layout_alignBottom="@+id/ki_angle_seekBar"
+                android:layout_marginBottom="6dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="kd_angle: 0"
+                android:id="@+id/kd_angle_textView"
+                android:layout_toEndOf="@+id/kd_angle_seekBar"
+                android:layout_alignBottom="@+id/kd_angle_seekBar"
+                android:layout_marginBottom="6dp"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/distLayout">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="55dp"
+                android:layout_marginRight="35dp"
+                android:layout_marginBottom="20dp"
+                android:id="@+id/distSettingsHeader"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Distance Settings"/>
+
+            <SeekBar
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/kp_dist_seekBar"
+                android:layout_marginBottom="10dp"
+                android:layout_below="@+id/distSettingsHeader"
+                android:indeterminate="false" />
+
+            <SeekBar
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/ki_dist_seekBar"
+                android:layout_below="@+id/kp_dist_seekBar"
+                android:layout_alignStart="@+id/kp_dist_seekBar"
+                android:indeterminate="false" />
+
+            <SeekBar
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/kd_dist_seekBar"
+                android:layout_below="@+id/ki_dist_seekBar"
+                android:layout_marginTop="10dp"
+                android:layout_alignStart="@+id/ki_dist_seekBar"
+                android:indeterminate="false" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="kp_dist: 0"
+                android:id="@+id/kp_dist_textView"
+                android:layout_toEndOf="@+id/kp_dist_seekBar"
+                android:layout_alignBottom="@+id/kp_dist_seekBar"
+                android:layout_marginBottom="6dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="ki_dist: 0"
+                android:id="@+id/ki_dist_textView"
+                android:layout_toEndOf="@+id/ki_dist_seekBar"
+                android:layout_alignBottom="@+id/ki_dist_seekBar"
+                android:layout_marginBottom="6dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="kd_dist: 0"
+                android:id="@+id/kd_dist_textView"
+                android:layout_toEndOf="@+id/kd_dist_seekBar"
+                android:layout_alignBottom="@+id/kd_dist_seekBar"
+                android:layout_marginBottom="6dp"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+</RelativeLayout>

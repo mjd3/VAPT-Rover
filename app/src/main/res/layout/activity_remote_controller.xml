@@ -8,21 +8,62 @@
 
     <RelativeLayout
         android:id="@+id/layout_joystick"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         android:background="@drawable/image_button_bg"
-        android:layout_marginEnd="50dp"
         android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true">
+        android:layout_marginRight="70dp"
+        android:layout_alignParentRight="true">
     </RelativeLayout>
 
-    <Button
-        android:layout_width="wrap_content"
+    <ImageButton
+        android:layout_width="70dp"
         android:layout_height="70dp"
-        android:singleLine="true"
-        android:text="@string/connect_button"
-        android:id="@+id/connectButton"
-        android:layout_alignParentEnd="true" />
+        android:id="@+id/left_arrow"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="70dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/left_arrow" />
+
+    <ImageButton
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:id="@+id/right_arrow"
+        android:layout_toRightOf="@+id/left_arrow"
+        android:layout_marginLeft="75dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/right_arrow" />
+
+    <ImageButton
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:id="@+id/up_arrow"
+        android:layout_toRightOf="@+id/left_arrow"
+        android:layout_marginLeft="2.5dp"
+        android:layout_marginBottom="2.5dp"
+        android:layout_above="@id/right_arrow"
+        android:src="@drawable/up_arrow" />
+
+    <ImageButton
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:id="@+id/down_arrow"
+        android:layout_toRightOf="@+id/left_arrow"
+        android:layout_marginLeft="2.5dp"
+        android:layout_marginTop="2.5dp"
+        android:layout_below="@id/right_arrow"
+        android:src="@drawable/down_arrow" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/RC_label"
+        android:id="@+id/RCactivity_label"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"/>
+
 
     <ImageView
         android:layout_width="70dp"
@@ -30,22 +71,22 @@
         android:id="@+id/bluetoothLogoView"
         android:src="@mipmap/bluetooth_logo"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@id/connectButton"
-        android:visibility="gone"/>
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No data..."
+        android:id="@+id/BTPingData"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="No data..."
         android:id="@+id/jsData"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/layout_joystick" />
-<LinearLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:layout_alignParentBottom="true">
+        android:layout_below="@+id/BTPingData" />
 
     <ImageButton
         android:layout_width="70dp"
@@ -54,138 +95,35 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:src="@drawable/stop_sign"
-        android:layout_gravity="bottom"
         android:layout_alignEnd="@+id/jsData"/>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_toRightOf="@id/stop_button"
-        android:id="@+id/left_turn_vert_layout"
-        android:layout_gravity="bottom">
-        <Button
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:id="@+id/degrees_left_90"
-            android:visibility="gone"
-            android:layout_toRightOf="@+id/stop_button" />
-        <ImageButton
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:id="@+id/left_turn_button"
-            android:src="@drawable/rotate_left_arrow"
-            android:layout_alignParentBottom="true"
-            android:layout_above="@+id/degrees_left_90"
-            android:layout_toEndOf="@+id/stop_button" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_toRightOf="@id/left_turn_vert_layout"
-        android:layout_gravity="bottom">
-        <Button
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:id="@+id/degrees_right_90"
-            android:visibility="gone"
-            android:layout_above="@+id/right_turn_button"/>
-        <ImageButton
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:id="@+id/right_turn_button"
-            android:layout_alignParentBottom="true"
-            android:src="@drawable/rotate_right_arrow" />
-    </LinearLayout>
-</LinearLayout>
     <SeekBar
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:id="@+id/kp_angle_seekBar"
-        android:layout_below="@+id/connectButton"
+        android:id="@+id/speed_seekBar"
+        android:progress="50"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="30dp"
+        android:layout_toRightOf="@+id/stop_button"
         android:indeterminate="false" />
-
-    <SeekBar
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/ki_angle_seekBar"
-        android:layout_below="@+id/kp_angle_seekBar"
-        android:layout_alignStart="@+id/kp_angle_seekBar"
-        android:indeterminate="false" />
-
-    <SeekBar
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/kp_dist_seekBar"
-        android:layout_below="@+id/ki_angle_seekBar"
-        android:layout_alignParentStart="true"
-        android:indeterminate="false" />
-
-    <SeekBar
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/ki_dist_seekBar"
-        android:layout_below="@+id/kp_dist_seekBar"
-        android:layout_alignParentStart="true"
-        android:indeterminate="false" />
-
-    <SeekBar
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/t_SeekBar"
-        android:layout_below="@+id/ki_dist_seekBar"
-        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="kp_angle"
-        android:id="@+id/kp_angle_textView"
-        android:layout_above="@+id/ki_angle_seekBar"
-        android:layout_alignStart="@+id/ki_angle_textView" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="ki_angle"
-        android:id="@+id/ki_angle_textView"
-        android:layout_alignBottom="@+id/ki_angle_seekBar"
-        android:layout_toEndOf="@+id/ki_angle_seekBar" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="kp_dist"
-        android:id="@+id/kp_dist_textView"
-        android:layout_above="@+id/ki_dist_seekBar"
-        android:layout_toEndOf="@+id/ki_dist_seekBar" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ki_dist"
-        android:id="@+id/ki_dist_textView"
-        android:layout_above="@+id/t_SeekBar"
-        android:layout_toEndOf="@+id/ki_dist_seekBar" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Action Time"
-        android:id="@+id/textView3"
-        android:layout_alignBottom="@+id/t_SeekBar"
-        android:layout_toEndOf="@+id/t_SeekBar" />
+        android:text="Sensitivity: 1.0"
+        android:id="@+id/speedSensitivityText"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/speed_seekBar"
+        android:layout_marginBottom="16dp"/>
 
     <Button
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send Command"
-        android:id="@+id/commandButton"
-        android:layout_below="@+id/textView3"
-        android:layout_alignParentStart="true" />
-
+        android:layout_height="70dp"
+        android:singleLine="true"
+        android:text="@string/switch_button"
+        android:id="@+id/switchButton"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"/>
 </RelativeLayout>

@@ -6,6 +6,8 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.io.IOException;
@@ -15,6 +17,8 @@ import java.io.OutputStream;
 public class DeviceConnector {
     private static final String TAG = "DeviceConnector";
     private static final boolean D = true;
+
+    public static final String CONNECTOR = "CONNECTOR";
 
     // Current connection state constants
     public static final int STATE_NONE = 0;       // we're doing nothing
@@ -78,7 +82,7 @@ public class DeviceConnector {
     private synchronized void setState(int state) {
         if (D) Log.d(TAG, "setState() " + mState + " -> " + state);
         mState = state;
-        mHandler.obtainMessage(RemoteControllerActivity.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+        mHandler.obtainMessage(RCApplication.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
 
     public synchronized int getState() {
@@ -104,7 +108,7 @@ public class DeviceConnector {
         setState(STATE_CONNECTED);
 
         // Send the name of the connected device back to the UI Activity
-        Message msg = mHandler.obtainMessage(RemoteControllerActivity.MESSAGE_DEVICE_NAME, deviceName);
+        Message msg = mHandler.obtainMessage(RCApplication.MESSAGE_DEVICE_NAME, deviceName);
         mHandler.sendMessage(msg);
 
         // Start the thread to manage the connection and perform transmissions
@@ -127,7 +131,7 @@ public class DeviceConnector {
     private void connectionFailed() {
         if (D) Log.d(TAG, "connectionFailed");
         // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(RemoteControllerActivity.MESSAGE_TOAST);
+        Message msg = mHandler.obtainMessage(RCApplication.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
         msg.setData(bundle);
         mHandler.sendMessage(msg);
@@ -136,7 +140,7 @@ public class DeviceConnector {
 
     private void connectionLost() {
         // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(RemoteControllerActivity.MESSAGE_TOAST);
+        Message msg = mHandler.obtainMessage(RCApplication.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
         msg.setData(bundle);
         mHandler.sendMessage(msg);
@@ -240,7 +244,7 @@ public class DeviceConnector {
                     readMessage.append(readed);
 
                     if (readed.contains("\n")) {
-                        mHandler.obtainMessage(RemoteControllerActivity.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
+                        mHandler.obtainMessage(RCApplication.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
                         readMessage.setLength(0);
                     }
 
