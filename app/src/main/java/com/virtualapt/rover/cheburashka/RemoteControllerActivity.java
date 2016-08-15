@@ -47,6 +47,7 @@ public class RemoteControllerActivity extends Activity{
     private ImageButton upArrow;
     private ImageButton downArrow;
     private Button switchButton;
+    private Button startLidarButton;
     private Button powerButton;
     private Button captureButton;
 
@@ -95,6 +96,7 @@ public class RemoteControllerActivity extends Activity{
         speed_seekBar = (SeekBar)findViewById(R.id.speed_seekBar);
         bluetoothLogoView = (ImageView)findViewById(R.id.bluetoothLogoView);
         switchButton = (Button)findViewById(R.id.switchButton);
+        startLidarButton = (Button)findViewById(R.id.startLidarButton);
         captureButton = (Button)findViewById(R.id.camCaptureButton);
         powerButton = (Button)findViewById(R.id.camPowerButton);
         stopButton = (ImageButton)findViewById(R.id.stop_button);
@@ -157,6 +159,15 @@ public class RemoteControllerActivity extends Activity{
                 Intent intent = new Intent();
                 setResult(Activity.RESULT_OK, intent);
                 finish();
+            }
+        });
+
+        startLidarButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    connector.write("VAPT7".getBytes());
+                }
             }
         });
 

@@ -6,40 +6,14 @@
     android:id="@+id/autoLayout"
     tools:context="com.virtualapt.rover.cheburashka.AutonomousActivity">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="70dp"
-        android:singleLine="true"
-        android:text="@string/connect"
-        android:id="@+id/connectButton"
-        android:layout_alignParentEnd="true" />
-
-    <ImageView
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:id="@+id/bluetoothLogoView"
-        android:src="@mipmap/bluetooth_logo"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@id/connectButton"
-        android:visibility="gone"/>
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/no_data"
         android:id="@+id/BTPingData"
+        android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Command:"
-        android:id="@+id/commandData"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="30dp"
-        android:layout_marginLeft="20dp"
-        android:layout_toRightOf="@+id/stop_button"/>
+        android:layout_marginTop="5dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -53,53 +27,37 @@
 
     <Button
         android:layout_width="wrap_content"
-        android:layout_height="70dp"
+        android:layout_height="wrap_content"
         android:singleLine="true"
-        android:text="@string/switch_mode"
-        android:id="@+id/switchButton"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"/>
+        android:text="@string/connect"
+        android:id="@+id/connectButton"
+        android:layout_alignParentEnd="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="70dp"
-        android:text="@string/start"
-        android:id="@+id/camCaptureButton"
-        android:layout_toLeftOf="@+id/switchButton"
-        android:layout_alignParentBottom="true"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="70dp"
-        android:text="@string/on"
-        android:id="@+id/camPowerButton"
-        android:layout_toLeftOf="@+id/camCaptureButton"
-        android:layout_alignParentBottom="true"/>
-
-    <ImageButton
+    <ImageView
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:id="@+id/stop_button"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:src="@drawable/stop_sign"
-        android:layout_gravity="bottom" />
+        android:layout_alignBottom="@+id/connectButton"
+        android:id="@+id/bluetoothLogoView"
+        android:src="@mipmap/bluetooth_logo"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/connectButton"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/connectButton"
         android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:id="@+id/settingsLayout">
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:id="@+id/angleLayout">
 
             <TextView
@@ -173,14 +131,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:id="@+id/distLayout">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="55dp"
-                android:layout_marginRight="35dp"
+                android:layout_marginStart="55dp"
+                android:layout_marginEnd="35dp"
                 android:layout_marginBottom="20dp"
                 android:id="@+id/distSettingsHeader"
                 android:textAppearance="?android:attr/textAppearanceLarge"
@@ -243,4 +201,60 @@
 
         </RelativeLayout>
     </LinearLayout>
+
+    <ImageButton
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:id="@+id/stopButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/stop_sign"
+        android:layout_gravity="bottom" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Command:"
+        android:id="@+id/commandData"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:layout_marginStart="20dp"
+        android:layout_toEndOf="@+id/stopButton"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/start"
+        android:id="@+id/camCaptureButton"
+        android:layout_toStartOf="@+id/switchButton"
+        android:layout_alignParentBottom="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/on"
+        android:id="@+id/camPowerButton"
+        android:layout_above="@+id/camCaptureButton"
+        android:layout_alignStart="@+id/camCaptureButton"
+        android:layout_alignEnd="@+id/camCaptureButton" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:text="@string/switch_mode"
+        android:id="@+id/switchButton"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:text="@string/start_lidar"
+        android:id="@+id/startLidarButton"
+        android:layout_above="@+id/switchButton"
+        android:layout_alignStart="@+id/switchButton"
+        android:layout_alignEnd="@+id/switchButton"/>
+
 </RelativeLayout>

@@ -65,6 +65,7 @@ public class AutonomousActivity extends Activity {
     private Button switchButton;
     private Button powerButton;
     private Button captureButton;
+    private Button startLidarButton;
     private ImageButton stopButton;
     private ImageView bluetoothLogoView;
 
@@ -108,7 +109,8 @@ public class AutonomousActivity extends Activity {
         switchButton = (Button)findViewById(R.id.switchButton);
         captureButton = (Button)findViewById(R.id.camCaptureButton);
         powerButton = (Button)findViewById(R.id.camPowerButton);
-        stopButton = (ImageButton)findViewById(R.id.stop_button);
+        startLidarButton = (Button)findViewById(R.id.startLidarButton);
+        stopButton = (ImageButton)findViewById(R.id.stopButton);
         BTPingData = (TextView)findViewById(R.id.BTPingData);
         commandData = (TextView)findViewById(R.id.commandData);
 
@@ -168,6 +170,19 @@ public class AutonomousActivity extends Activity {
                 else {
                     Toast.makeText(AutonomousActivity.this,
                             "Must connect to BT before changing modes", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        startLidarButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    connector.write("VAPT7".getBytes());
+                }
+                else {
+                    Toast.makeText(AutonomousActivity.this,
+                            "Must connect to Bluetooth before starting Lidar", Toast.LENGTH_SHORT).show();
                 }
             }
         });

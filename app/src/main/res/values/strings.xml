@@ -5,6 +5,7 @@
     <string name="lidar_label">LIDAR Mode</string>
     <string name="RC_label">RC Mode</string>
     <string name="disconnect">Disconnect</string>
+    <string name="start_lidar">Start LIDAR</string>
     <string name="empty"></string>
     <string name="yes">yes</string>
     <string name="no">no</string>
