@@ -12,7 +12,7 @@
         android:layout_height="250dp"
         android:background="@drawable/image_button_bg"
         android:layout_centerVertical="true"
-        android:layout_marginRight="70dp"
+        android:layout_marginRight="30dp"
         android:layout_alignParentRight="true">
     </RelativeLayout>
 
@@ -21,7 +21,7 @@
         android:layout_height="70dp"
         android:id="@+id/left_arrow"
         android:layout_alignParentStart="true"
-        android:layout_marginLeft="70dp"
+        android:layout_marginLeft="30dp"
         android:layout_centerVertical="true"
         android:src="@drawable/left_arrow" />
 
@@ -61,7 +61,7 @@
         android:id="@+id/RCactivity_label"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"/>
 
 
@@ -76,7 +76,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No data..."
+        android:text="@string/no_data"
         android:id="@+id/BTPingData"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true" />
@@ -84,7 +84,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No data..."
+        android:text="@string/no_data"
         android:id="@+id/jsData"
         android:layout_below="@+id/BTPingData" />
 
@@ -94,18 +94,16 @@
         android:id="@+id/stop_button"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:src="@drawable/stop_sign"
-        android:layout_alignEnd="@+id/jsData"/>
+        android:src="@drawable/stop_sign" />
 
     <SeekBar
-        android:layout_width="250dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/speed_seekBar"
         android:progress="50"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="30dp"
-        android:layout_toRightOf="@+id/stop_button"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/speedSensitivityText"
+        android:layout_marginRight="10dp"
         android:indeterminate="false" />
 
     <TextView
@@ -114,16 +112,32 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Sensitivity: 1.0"
         android:id="@+id/speedSensitivityText"
-        android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@+id/speed_seekBar"
-        android:layout_marginBottom="16dp"/>
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/RCactivity_label"
+        android:layout_margin="10dp"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="70dp"
         android:singleLine="true"
-        android:text="@string/switch_button"
+        android:text="@string/switch_mode"
         android:id="@+id/switchButton"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:text="@string/start"
+        android:id="@+id/camCaptureButton"
+        android:layout_toLeftOf="@+id/switchButton"
+        android:layout_alignParentBottom="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:text="@string/on"
+        android:id="@+id/camPowerButton"
+        android:layout_toLeftOf="@+id/camCaptureButton"
         android:layout_alignParentBottom="true"/>
 </RelativeLayout>

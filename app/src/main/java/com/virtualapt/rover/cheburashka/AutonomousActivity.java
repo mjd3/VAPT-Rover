@@ -33,8 +33,11 @@ public class AutonomousActivity extends Activity {
     static final int REQUEST_ENABLE_BT = 2;
     static final int REQUEST_RC_MODE = 3;
 
-    TimerTask updatePingTask;
     Timer updatePingTimer;
+    TimerTask updatePingTask;
+
+    boolean camLock = false;
+    Timer camLockTimer;
 
     // Declare/define all of the textViews,  buttons, and seekBars, as well as the
     // changeable values (kp, ki, kd)
@@ -60,6 +63,8 @@ public class AutonomousActivity extends Activity {
 
     private Button connectButton;
     private Button switchButton;
+    private Button powerButton;
+    private Button captureButton;
     private ImageButton stopButton;
     private ImageView bluetoothLogoView;
 
@@ -101,6 +106,8 @@ public class AutonomousActivity extends Activity {
 
         connectButton = (Button)findViewById(R.id.connectButton);
         switchButton = (Button)findViewById(R.id.switchButton);
+        captureButton = (Button)findViewById(R.id.camCaptureButton);
+        powerButton = (Button)findViewById(R.id.camPowerButton);
         stopButton = (ImageButton)findViewById(R.id.stop_button);
         BTPingData = (TextView)findViewById(R.id.BTPingData);
         commandData = (TextView)findViewById(R.id.commandData);
@@ -115,11 +122,37 @@ public class AutonomousActivity extends Activity {
             Log.d("BT", "Setting up BT adapter");
         }
 
+        // Begin updating ping numbers
+        updatePingTimer = new Timer();
+        updatePingTask = new TimerTask(){
+            @Override
+            public void run() {
+                updatePingText();
+            }
+        };
+        updatePingTimer.scheduleAtFixedRate(updatePingTask, 0, 250);
+
+        // Setup camera locking timer
+        camLockTimer = new Timer();
+        class CamLockTask extends TimerTask {
+            public void run() {
+                camLock = false;
+            }
+        }
+
         // Set the startDeviceListActivity function as the result of clicking the connect button
+        // and disconnect from bluetooth if disconnect button is clicked
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v){
-                startDeviceListActivity();
+            public void onClick(View v) {
+                if (getString(R.string.connect).equals(connectButton.getText().toString())) {
+                    startDeviceListActivity();
+                }
+                else {
+                    connectButton.setText(R.string.connect);
+                    bluetoothLogoView.setVisibility(View.GONE);
+                    ((RCApplication) getApplication()).stopConnection();
+                }
             }
         });
 
@@ -128,14 +161,73 @@ public class AutonomousActivity extends Activity {
         switchButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                if (isConnected())
+                if (isConnected()) {
+                    connector.write("VAPT4".getBytes());
                     startRemoteControllerActivity();
+                }
                 else {
                     Toast.makeText(AutonomousActivity.this,
                             "Must connect to BT before changing modes", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        // If power button is clicked, send message to Propeller board to press the power button
+        // on the Andoers, if the phone is connected over BT
+        powerButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    if (camLock)
+                        Toast.makeText(AutonomousActivity.this,
+                                "Wait until camera has finished processing previous command",
+                                Toast.LENGTH_SHORT).show();
+                    else {
+                        connector.write("VAPT5".getBytes());
+                        camLock = true;
+                        camLockTimer.schedule(new CamLockTask(), 6500);
+                        if (getString(R.string.on).equals(powerButton.getText().toString()))
+                            powerButton.setText(R.string.off);
+                        else
+                            powerButton.setText(R.string.on);
+                    }
+                }
+
+                else {
+                    Toast.makeText(AutonomousActivity.this,
+                            "Must connect to BT first", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // If capture button is clicked, send message to Propeller board to press the capture button
+        // on the Andoers, if the phone is connected over BT
+        captureButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    if (camLock)
+                        Toast.makeText(AutonomousActivity.this,
+                                "Wait until camera has finished processing previous command",
+                                Toast.LENGTH_SHORT).show();
+                    else {
+                        connector.write("VAPT6".getBytes());
+                        camLock = true;
+                        camLockTimer.schedule(new CamLockTask(), 250);
+                        if (getString(R.string.start).equals(captureButton.getText().toString()))
+                            captureButton.setText(R.string.stop);
+                        else
+                            captureButton.setText(R.string.start);
+                    }
+                }
+
+                else {
+                    Toast.makeText(AutonomousActivity.this,
+                            "Must connect to BT first", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
 
         // Create listeners for each seek bar that is triggered when their progress is changed.
         // Send packet with new values to the propeller board each time one is changed.
@@ -241,16 +333,6 @@ public class AutonomousActivity extends Activity {
                     connector.write(command);
             }
         });
-
-        // Begin updating ping numbers
-        updatePingTimer = new Timer();
-        updatePingTask = new TimerTask(){
-            @Override
-            public void run() {
-                updatePingText();
-            }
-        };
-        updatePingTimer.scheduleAtFixedRate(updatePingTask, 0, 250);
     }
 
     @Override
@@ -264,9 +346,9 @@ public class AutonomousActivity extends Activity {
             public void run() {
                 int pings = ((RCApplication) getApplication()).getPings();
                 BTPingData.setText("Pings: " + pings);
-                if (isConnected()) {
+                if (isConnected() && bluetoothLogoView.getVisibility() == View.GONE) {
                     bluetoothLogoView.setVisibility(View.VISIBLE);
-                    connectButton.setText(R.string.disconnect_button);
+                    connectButton.setText(R.string.disconnect);
                 }
             }
         });

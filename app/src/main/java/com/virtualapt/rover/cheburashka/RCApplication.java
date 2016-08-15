@@ -35,15 +35,6 @@ public class RCApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // Begin pinging task
-        pingTimer = new Timer();
-        pingTimerTask = new TimerTask(){
-            @Override
-            public void run() {
-                startPingProcess();
-            }
-        };
-
         // Make sure device is bluetooth-enabled
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter == null) {
@@ -115,6 +106,14 @@ public class RCApplication extends Application {
                         // If just connected, display bluetooth logo, switch connect button
                         // to disconnect button, and start pinging
                         case DeviceConnector.STATE_CONNECTED:
+                            // Setup pinging task and schedule it
+                            pingTimer = new Timer();
+                            pingTimerTask = new TimerTask(){
+                                @Override
+                                public void run() {
+                                    startPingProcess();
+                                }
+                            };
                             pingTimer.scheduleAtFixedRate(pingTimerTask, 0, 250);
                             //bar.setSubtitle(MSG_CONNECTED);
                             break;
@@ -124,10 +123,13 @@ public class RCApplication extends Application {
                         case DeviceConnector.STATE_NONE:
                             //bar.setSubtitle(MSG_NOT_CONNECTED);
                             break;
-
-                        // If disconnected, remove bluetooth logo and change button back to
-                        // connect button
+                        // If disconnected, stop the ping timer task
                         case DeviceConnector.STATE_DISCONNECTED:
+                            if (pingTimer != null) {
+                                pingTimer.cancel();
+                                pingTimer.purge();
+                            }
+                            nPing = 0;
                             break;
                     }
                     break;

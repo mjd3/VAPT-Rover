@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -36,6 +37,9 @@ public class RemoteControllerActivity extends Activity{
     TimerTask updatePingTask;
     Timer updatePingTimer;
 
+    boolean camLock = false;
+    Timer camLockTimer;
+
     private ImageView bluetoothLogoView;
     private ImageButton stopButton;
     private ImageButton leftArrow;
@@ -43,6 +47,8 @@ public class RemoteControllerActivity extends Activity{
     private ImageButton upArrow;
     private ImageButton downArrow;
     private Button switchButton;
+    private Button powerButton;
+    private Button captureButton;
 
     private SeekBar speed_seekBar;
     private TextView speedSensitivtyText;
@@ -89,11 +95,21 @@ public class RemoteControllerActivity extends Activity{
         speed_seekBar = (SeekBar)findViewById(R.id.speed_seekBar);
         bluetoothLogoView = (ImageView)findViewById(R.id.bluetoothLogoView);
         switchButton = (Button)findViewById(R.id.switchButton);
+        captureButton = (Button)findViewById(R.id.camCaptureButton);
+        powerButton = (Button)findViewById(R.id.camPowerButton);
         stopButton = (ImageButton)findViewById(R.id.stop_button);
         upArrow = (ImageButton)findViewById(R.id.up_arrow);
         downArrow = (ImageButton)findViewById(R.id.down_arrow);
         leftArrow = (ImageButton)findViewById(R.id.left_arrow);
         rightArrow = (ImageButton)findViewById(R.id.right_arrow);
+
+        // Setup camera locking timer
+        camLockTimer = new Timer();
+        class CamLockTask extends TimerTask {
+            public void run() {
+                camLock = false;
+            }
+        }
 
         // Set up joystick layout
         jsData = (TextView)findViewById(R.id.jsData);
@@ -137,9 +153,82 @@ public class RemoteControllerActivity extends Activity{
         switchButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
+                connector.write("VAPT4".getBytes());
                 Intent intent = new Intent();
                 setResult(Activity.RESULT_OK, intent);
                 finish();
+            }
+        });
+
+        // If power button is clicked, send message to Propeller board to press the power button
+        // on the Andoers, if the phone is connected over BT
+        powerButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    if (camLock) {
+                        Toast toast = Toast.makeText(RemoteControllerActivity.this,
+                                "Wait until camera has finished processing previous command",
+                                Toast.LENGTH_SHORT);
+                        TextView toastView = (TextView) toast.getView().findViewById(android.R.id.message);
+                        if (toastView != null) toastView.setGravity(Gravity.CENTER);
+                        toast.show();
+                    }
+                    else {
+                        connector.write("VAPT5".getBytes());
+                        camLock = true;
+                        camLockTimer.schedule(new CamLockTask(), 6500);
+                        if (getString(R.string.on).equals(powerButton.getText().toString()))
+                            powerButton.setText(R.string.off);
+                        else
+                            powerButton.setText(R.string.on);
+                    }
+                }
+
+                else {
+                    Toast toast = Toast.makeText(RemoteControllerActivity.this,
+                            "Phone must first be connected over Bluetooth",
+                            Toast.LENGTH_SHORT);
+                    TextView toastView = (TextView) toast.getView().findViewById(android.R.id.message);
+                    if (toastView != null) toastView.setGravity(Gravity.CENTER);
+                    toast.show();
+                }
+            }
+        });
+
+        // If capture button is clicked, send message to Propeller board to press the capture button
+        // on the Andoers, if the phone is connected over BT
+        captureButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    if (camLock) {
+                        Toast toast = Toast.makeText(RemoteControllerActivity.this,
+                                "Wait until camera has finished processing previous command",
+                                Toast.LENGTH_SHORT);
+                        TextView toastView = (TextView) toast.getView().findViewById(android.R.id.message);
+                        if (toastView != null) toastView.setGravity(Gravity.CENTER);
+                        toast.show();
+                    }
+                    else {
+                        connector.write("VAPT6".getBytes());
+                        camLock = true;
+                        camLockTimer.schedule(new CamLockTask(), 250);
+                        if (getString(R.string.start).equals(captureButton.getText().toString()))
+                            captureButton.setText(R.string.stop);
+                        else
+                            captureButton.setText(R.string.start);
+                    }
+                }
+
+                else {
+                    Toast toast = Toast.makeText(RemoteControllerActivity.this,
+                            "Phone must first be connected over Bluetooth",
+                            Toast.LENGTH_SHORT);
+                    TextView toastView = (TextView) toast.getView().findViewById(android.R.id.message);
+                    if (toastView != null) toastView.setGravity(Gravity.CENTER);
+                    toast.show();
+                }
             }
         });
 
