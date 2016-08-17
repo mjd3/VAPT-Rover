@@ -52,8 +52,8 @@
         android:layout_margin="10dp"/>
 
     <ImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:id="@+id/bluetoothLogoView"
         android:src="@mipmap/bluetooth_logo"
         android:layout_alignParentTop="true"
@@ -110,10 +110,27 @@
     <ImageButton
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:id="@+id/stop_button"
+        android:id="@+id/stopButton"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:src="@drawable/stop_sign" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/start_data"
+        android:id="@+id/dataButton"
+        android:layout_above="@+id/saveButton"
+        android:layout_alignStart="@+id/saveButton"
+        android:layout_alignEnd="@+id/saveButton" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/save"
+        android:id="@+id/saveButton"
+        android:layout_toStartOf="@+id/camPowerButton"
+        android:layout_alignParentBottom="true" />
 
     <Button
         android:layout_width="wrap_content"

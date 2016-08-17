@@ -52,7 +52,6 @@ public class AutonomousActivity extends Activity {
     private TextView ki_dist_textView;
     private TextView kd_dist_textView;
     private TextView BTPingData;
-    private TextView commandData;
 
     private SeekBar kp_angle_seekBar;
     private SeekBar ki_angle_seekBar;
@@ -65,9 +64,12 @@ public class AutonomousActivity extends Activity {
     private Button switchButton;
     private Button powerButton;
     private Button captureButton;
+    private Button dataButton;
+    private Button saveButton;
     private Button startLidarButton;
     private ImageButton stopButton;
     private ImageView bluetoothLogoView;
+    private boolean lidarStartFlag = false;
 
     // Initialize Bluetooth objects and variables
     private BluetoothAdapter btAdapter;
@@ -110,9 +112,10 @@ public class AutonomousActivity extends Activity {
         captureButton = (Button)findViewById(R.id.camCaptureButton);
         powerButton = (Button)findViewById(R.id.camPowerButton);
         startLidarButton = (Button)findViewById(R.id.startLidarButton);
+        dataButton = (Button)findViewById(R.id.dataButton);
+        saveButton = (Button)findViewById(R.id.saveButton);
         stopButton = (ImageButton)findViewById(R.id.stopButton);
         BTPingData = (TextView)findViewById(R.id.BTPingData);
-        commandData = (TextView)findViewById(R.id.commandData);
 
         btAdapter = ((RCApplication) getApplication()).getBTAdapter();
 
@@ -179,6 +182,7 @@ public class AutonomousActivity extends Activity {
             public void onClick(View v){
                 if (isConnected()) {
                     connector.write("VAPT7".getBytes());
+                    lidarStartFlag = true;
                 }
                 else {
                     Toast.makeText(AutonomousActivity.this,
@@ -239,6 +243,40 @@ public class AutonomousActivity extends Activity {
                 else {
                     Toast.makeText(AutonomousActivity.this,
                             "Must connect to BT first", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        dataButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    if (lidarStartFlag)
+                        connector.write("VAPT8".getBytes());
+                    else
+                        Toast.makeText(AutonomousActivity.this,
+                                "Must start Lidar to start data collection", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(AutonomousActivity.this,
+                            "Must connect to Bluetooth before collecting data", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        saveButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    if (lidarStartFlag)
+                        connector.write("VAPT9".getBytes());
+                    else
+                        Toast.makeText(AutonomousActivity.this,
+                                "Must start Lidar to save data", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(AutonomousActivity.this,
+                            "Must connect to Bluetooth before saving data", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -383,9 +421,6 @@ public class AutonomousActivity extends Activity {
         c[command.length] = (byte) bar.ordinal();
         c[command.length + 1] = (byte) val;
         c[command.length + 2] = (byte) '\r';
-
-        String strs = new String(c);
-        commandData.setText("Command: " + strs);
 
         if (isConnected())
             connector.write(c);

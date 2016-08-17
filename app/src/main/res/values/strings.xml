@@ -13,6 +13,9 @@
     <string name="off">Cameras Off</string>
     <string name="start">Start Capture</string>
     <string name="stop">Stop Capture</string>
+    <string name="start_data">Start Data</string>
+    <string name="stop_data">Stop Data</string>
+    <string name="save">Save Data</string>
     <string name="no_data">No Data...</string>
     <string name="client_text">This device will act as a client. Click on Start Chatting button</string>
     <string name="empty_message">No devices found. Turn on P2P and perform discovery from the Action Bar</string>

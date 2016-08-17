@@ -48,8 +48,11 @@ public class RemoteControllerActivity extends Activity{
     private ImageButton downArrow;
     private Button switchButton;
     private Button startLidarButton;
+    private Button dataButton;
+    private Button saveButton;
     private Button powerButton;
     private Button captureButton;
+    private boolean lidarStartFlag = false;
 
     private SeekBar speed_seekBar;
     private TextView speedSensitivtyText;
@@ -97,9 +100,11 @@ public class RemoteControllerActivity extends Activity{
         bluetoothLogoView = (ImageView)findViewById(R.id.bluetoothLogoView);
         switchButton = (Button)findViewById(R.id.switchButton);
         startLidarButton = (Button)findViewById(R.id.startLidarButton);
+        dataButton = (Button)findViewById(R.id.dataButton);
+        saveButton = (Button)findViewById(R.id.saveButton);
         captureButton = (Button)findViewById(R.id.camCaptureButton);
         powerButton = (Button)findViewById(R.id.camPowerButton);
-        stopButton = (ImageButton)findViewById(R.id.stop_button);
+        stopButton = (ImageButton)findViewById(R.id.stopButton);
         upArrow = (ImageButton)findViewById(R.id.up_arrow);
         downArrow = (ImageButton)findViewById(R.id.down_arrow);
         leftArrow = (ImageButton)findViewById(R.id.left_arrow);
@@ -167,6 +172,41 @@ public class RemoteControllerActivity extends Activity{
             public void onClick(View v){
                 if (isConnected()) {
                     connector.write("VAPT7".getBytes());
+                    lidarStartFlag = true;
+                }
+            }
+        });
+
+        dataButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    if (lidarStartFlag)
+                        connector.write("VAPT8".getBytes());
+                    else
+                        Toast.makeText(RemoteControllerActivity.this,
+                                "Must start Lidar to start data collection", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(RemoteControllerActivity.this,
+                            "Must connect to Bluetooth before collecting data", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        saveButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    if (lidarStartFlag)
+                        connector.write("VAPT9".getBytes());
+                    else
+                        Toast.makeText(RemoteControllerActivity.this,
+                                "Must start Lidar to save data", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(RemoteControllerActivity.this,
+                            "Must connect to Bluetooth before saving data", Toast.LENGTH_SHORT).show();
                 }
             }
         });
