@@ -203,8 +203,8 @@
     </LinearLayout>
 
     <ImageButton
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/stopButton"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
@@ -214,36 +214,68 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/lidar_options"
+        android:id="@+id/optionsButton"
+        android:layout_above="@+id/switchButton"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="false"
+        android:text="@string/start_lidar"
+        android:id="@+id/startLidarButton"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/stopButton"
+        android:layout_marginStart="5dp"
+        android:visibility="visible"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="@string/start_data"
         android:id="@+id/dataButton"
-        android:layout_above="@+id/saveButton"
-        android:layout_alignStart="@+id/saveButton"
-        android:layout_alignEnd="@+id/saveButton" />
+        android:layout_toEndOf="@+id/stopButton"
+        android:layout_marginStart="5dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/reset"
+        android:id="@+id/resetButton"
+        android:layout_toEndOf="@+id/dataButton"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/save"
         android:id="@+id/saveButton"
-        android:layout_toStartOf="@+id/camPowerButton"
-        android:layout_alignParentBottom="true" />
+        android:layout_toEndOf="@+id/resetButton"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/start"
-        android:id="@+id/camCaptureButton"
-        android:layout_toStartOf="@+id/switchButton"
-        android:layout_alignParentBottom="true"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/on"
+        android:text="@string/cam_on"
         android:id="@+id/camPowerButton"
-        android:layout_above="@+id/camCaptureButton"
-        android:layout_alignStart="@+id/camCaptureButton"
-        android:layout_alignEnd="@+id/camCaptureButton" />
+        android:layout_toEndOf="@+id/stopButton"
+        android:layout_marginStart="5dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/cam_capture_start"
+        android:id="@+id/camCaptureButton"
+        android:layout_toEndOf="@+id/camPowerButton"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone" />
 
     <Button
         android:layout_width="wrap_content"
@@ -253,15 +285,5 @@
         android:id="@+id/switchButton"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:text="@string/start_lidar"
-        android:id="@+id/startLidarButton"
-        android:layout_above="@+id/switchButton"
-        android:layout_alignStart="@+id/switchButton"
-        android:layout_alignEnd="@+id/switchButton"/>
 
 </RelativeLayout>

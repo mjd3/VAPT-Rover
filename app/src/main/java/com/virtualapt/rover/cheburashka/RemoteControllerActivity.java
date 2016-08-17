@@ -47,19 +47,20 @@ public class RemoteControllerActivity extends Activity{
     private ImageButton upArrow;
     private ImageButton downArrow;
     private Button switchButton;
+    private Button optionsButton;
     private Button startLidarButton;
     private Button dataButton;
+    private Button resetButton;
     private Button saveButton;
     private Button powerButton;
     private Button captureButton;
     private boolean lidarStartFlag = false;
 
     private SeekBar speed_seekBar;
-    private TextView speedSensitivtyText;
+    private TextView speedSensitivityText;
     private double speedSensitivity = 1;
 
     private TextView BTPingData;
-    private TextView jsData;
     String jsString;
     JoyStickClass js;
     RelativeLayout layout_joystick;
@@ -94,13 +95,15 @@ public class RemoteControllerActivity extends Activity{
         connector = ((RCApplication) getApplication()).getBTConnector(null);
 
         // Find all views in the layout and set their variables
-        speedSensitivtyText = (TextView) findViewById(R.id.speedSensitivityText);
+        speedSensitivityText = (TextView) findViewById(R.id.speedSensitivityText);
         BTPingData = (TextView)findViewById(R.id.BTPingData);
         speed_seekBar = (SeekBar)findViewById(R.id.speed_seekBar);
         bluetoothLogoView = (ImageView)findViewById(R.id.bluetoothLogoView);
         switchButton = (Button)findViewById(R.id.switchButton);
+        optionsButton = (Button)findViewById(R.id.optionsButton);
         startLidarButton = (Button)findViewById(R.id.startLidarButton);
         dataButton = (Button)findViewById(R.id.dataButton);
+        resetButton = (Button)findViewById(R.id.resetButton);
         saveButton = (Button)findViewById(R.id.saveButton);
         captureButton = (Button)findViewById(R.id.camCaptureButton);
         powerButton = (Button)findViewById(R.id.camPowerButton);
@@ -119,7 +122,6 @@ public class RemoteControllerActivity extends Activity{
         }
 
         // Set up joystick layout
-        jsData = (TextView)findViewById(R.id.jsData);
         layout_joystick = (RelativeLayout)findViewById(R.id.layout_joystick);
         js = new JoyStickClass(getApplicationContext(),
                 layout_joystick, R.drawable.image_button);
@@ -135,7 +137,7 @@ public class RemoteControllerActivity extends Activity{
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
 
                 speedSensitivity = (double)(progress)/50.0;
-                speedSensitivtyText.setText("Sensitivity: " + speedSensitivity);
+                speedSensitivityText.setText("Sensitivity: " + speedSensitivity);
             }
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
@@ -160,10 +162,46 @@ public class RemoteControllerActivity extends Activity{
         switchButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                connector.write("VAPT4".getBytes());
+                connector.write("VAPT5".getBytes());
                 Intent intent = new Intent();
                 setResult(Activity.RESULT_OK, intent);
                 finish();
+            }
+        });
+
+        // If the options button is clicked, cycle through different options menus
+        optionsButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (getString(R.string.lidar_options).equals(optionsButton.getText().toString())) {
+                    optionsButton.setText(R.string.data_options);
+                    startLidarButton.setVisibility(View.GONE);
+                    dataButton.setVisibility(View.VISIBLE);
+                    resetButton.setVisibility(View.VISIBLE);
+                    saveButton.setVisibility(View.VISIBLE);
+                }
+                else if (getString(R.string.data_options).equals(optionsButton.getText().toString())) {
+                    optionsButton.setText(R.string.cam_options);
+                    dataButton.setVisibility(View.GONE);
+                    resetButton.setVisibility(View.GONE);
+                    saveButton.setVisibility(View.GONE);
+                    powerButton.setVisibility(View.VISIBLE);
+                    captureButton.setVisibility(View.VISIBLE);
+                }
+                else if (lidarStartFlag){
+                    optionsButton.setText(R.string.data_options);
+                    powerButton.setVisibility(View.GONE);
+                    captureButton.setVisibility(View.GONE);
+                    dataButton.setVisibility(View.VISIBLE);
+                    resetButton.setVisibility(View.VISIBLE);
+                    saveButton.setVisibility(View.VISIBLE);
+                }
+                else {
+                    optionsButton.setText(R.string.lidar_options);
+                    powerButton.setVisibility(View.GONE);
+                    captureButton.setVisibility(View.GONE);
+                    startLidarButton.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -171,7 +209,7 @@ public class RemoteControllerActivity extends Activity{
             @Override
             public void onClick(View v){
                 if (isConnected()) {
-                    connector.write("VAPT7".getBytes());
+                    connector.write("VAPT6".getBytes());
                     lidarStartFlag = true;
                 }
             }
@@ -181,11 +219,34 @@ public class RemoteControllerActivity extends Activity{
             @Override
             public void onClick(View v){
                 if (isConnected()) {
-                    if (lidarStartFlag)
-                        connector.write("VAPT8".getBytes());
+                    if (lidarStartFlag) {
+                        connector.write("VAPT7".getBytes());
+                        if (getString(R.string.start_data).equals(dataButton.getText().toString()))
+                            dataButton.setText(R.string.stop_data);
+                        else
+                            dataButton.setText(R.string.start_data);
+                    }
                     else
                         Toast.makeText(RemoteControllerActivity.this,
                                 "Must start Lidar to start data collection", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(RemoteControllerActivity.this,
+                            "Must connect to Bluetooth before collecting data", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        resetButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    if (lidarStartFlag && getString(R.string.start_data).equals(dataButton.getText().toString())) {
+                        connector.write("VAPT8".getBytes());
+                    }
+                    else
+                        Toast.makeText(RemoteControllerActivity.this,
+                                "Must start and stop collecting data before resetting", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     Toast.makeText(RemoteControllerActivity.this,
@@ -198,8 +259,13 @@ public class RemoteControllerActivity extends Activity{
             @Override
             public void onClick(View v){
                 if (isConnected()) {
-                    if (lidarStartFlag)
-                        connector.write("VAPT9".getBytes());
+                    if (lidarStartFlag) {
+                        if (getString(R.string.start_data).equals(dataButton.getText().toString()))
+                            connector.write("VAPT9".getBytes());
+                        else
+                            Toast.makeText(RemoteControllerActivity.this,
+                                    "Must stop collecting data to save", Toast.LENGTH_SHORT).show();
+                    }
                     else
                         Toast.makeText(RemoteControllerActivity.this,
                                 "Must start Lidar to save data", Toast.LENGTH_SHORT).show();
@@ -226,13 +292,13 @@ public class RemoteControllerActivity extends Activity{
                         toast.show();
                     }
                     else {
-                        connector.write("VAPT5".getBytes());
+                        connector.write("VAPTA".getBytes());
                         camLock = true;
                         camLockTimer.schedule(new CamLockTask(), 6500);
-                        if (getString(R.string.on).equals(powerButton.getText().toString()))
-                            powerButton.setText(R.string.off);
+                        if (getString(R.string.cam_on).equals(powerButton.getText().toString()))
+                            powerButton.setText(R.string.cam_off);
                         else
-                            powerButton.setText(R.string.on);
+                            powerButton.setText(R.string.cam_on);
                     }
                 }
 
@@ -262,13 +328,13 @@ public class RemoteControllerActivity extends Activity{
                         toast.show();
                     }
                     else {
-                        connector.write("VAPT6".getBytes());
+                        connector.write("VAPTB".getBytes());
                         camLock = true;
                         camLockTimer.schedule(new CamLockTask(), 250);
-                        if (getString(R.string.start).equals(captureButton.getText().toString()))
-                            captureButton.setText(R.string.stop);
+                        if (getString(R.string.cam_capture_start).equals(captureButton.getText().toString()))
+                            captureButton.setText(R.string.cam_capture_stop);
                         else
-                            captureButton.setText(R.string.start);
+                            captureButton.setText(R.string.cam_capture_start);
                     }
                 }
 
@@ -329,62 +395,14 @@ public class RemoteControllerActivity extends Activity{
 
         layout_joystick.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View arg0, MotionEvent arg1) {
-                // computes and displays how many KB/s are being received from the rover
-                if(showRxStats) {
-                    int nowbytes = (int) TrafficStats.getTotalRxBytes();
-                    if (nowbytes - prevbytes > 500000) {
-                        rxRate = (nowbytes - prevbytes) / (System.currentTimeMillis() - prevTime);
-                        prevTime = System.currentTimeMillis();
-                        prevbytes = nowbytes;
-                        jsData.setText(String.valueOf(rxRate));
-                    }
-                }
-                js.drawStick(arg1);
-                //  if(arg1.getAction() == MotionEvent.ACTION_DOWN && arg1.getAction() == MotionEvent.ACTION_MOVE) {
-                    if(arg1.getAction() == MotionEvent.ACTION_MOVE) {
-                        if(showJSStats) {
-                            jsString = "X : ";
-                            jsString = jsString.concat(String.valueOf(js.getX()) + "\n");
-                            jsString = jsString.concat("Y : " + String.valueOf(js.getY()) + "\n");
-                            jsString = jsString.concat("Angle : " + String.valueOf(js.getAngle()) + "\n");
-                            jsString = jsString.concat("Distance : " + String.valueOf(js.getDistance()) + "\n");
-                            jsData.setText(jsString);
-                        }
 
-                    int direction = js.get8Direction();
-                    if(direction == JoyStickClass.STICK_UP) {
-                        //Log.d(TAG,"Direction : Up");
-                    } else if(direction == JoyStickClass.STICK_UPRIGHT) {
-                        //Log.d(TAG,"Direction : Up Right");
-                    } else if(direction == JoyStickClass.STICK_RIGHT) {
-                        //Log.d(TAG,"Direction : Right");
-                    } else if(direction == JoyStickClass.STICK_DOWNRIGHT) {
-                        //Log.d(TAG,"Direction : Down Right");
-                    } else if(direction == JoyStickClass.STICK_DOWN) {
-                        //Log.d(TAG,"Direction : Down");
-                    } else if(direction == JoyStickClass.STICK_DOWNLEFT) {
-                       // Log.d(TAG,"Direction : Down Left");
-                    } else if(direction == JoyStickClass.STICK_LEFT) {
-                       // Log.d(TAG,"Direction : Left");
-                    } else if(direction == JoyStickClass.STICK_UPLEFT) {
-                      //  Log.d(TAG,"Direction : Up Left");
-                    } else if(direction == JoyStickClass.STICK_NONE) {
-                      //  Log.d(TAG,"Direction : Center");
-                    }
-                        jsCoords2MotionCommand(js);
-                } else if(arg1.getAction() == MotionEvent.ACTION_UP) {
-                        if(showJSStats) {
-                            jsString = "X : ";
-                            jsString = jsString.concat(String.valueOf(js.getX()) + "\n");
-                            jsString = jsString.concat("Y : " + String.valueOf(js.getY()) + "\n");
-                            jsString = jsString.concat("Angle : " + String.valueOf(js.getAngle()) + "\n");
-                            jsString = jsString.concat("Distance : " + String.valueOf(js.getDistance()) + "\n");
-                            jsData.setText(jsString);
-                        }
-                        sendMotionCommand(0,0);
-                } else if(arg1.getAction() == MotionEvent.ACTION_CANCEL){
-                        sendMotionCommand(0,0);
-                    }
+                js.drawStick(arg1);
+                if(arg1.getAction() == MotionEvent.ACTION_MOVE)
+                    jsCoords2MotionCommand(js);
+                else if(arg1.getAction() == MotionEvent.ACTION_UP)
+                    sendMotionCommand(0,0);
+                else if(arg1.getAction() == MotionEvent.ACTION_CANCEL)
+                    sendMotionCommand(0,0);
                 return true;
             }
         });
@@ -418,19 +436,6 @@ public class RemoteControllerActivity extends Activity{
         });
     }
 
-    public void showJSData(final int x, final int y){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                String jsString;
-                jsString = "X : ";
-                jsString = jsString.concat(String.valueOf(x) + "\n");
-                jsString = jsString.concat("Y : " + String.valueOf(y) + "\n");
-                jsData.setText(jsString);
-            }
-        });
-    }
-
     public void jsCoords2MotionCommand(JoyStickClass js) {
 
        //JoyStick reverses y axis due to landscape layout, so re-invert it back here
@@ -451,15 +456,7 @@ public class RemoteControllerActivity extends Activity{
             lWheelSpeed = (int) (y - x);
             rWheelSpeed = (int) (y + x);
         }
-
-        jsData.setText("lWheelSpeed: " + lWheelSpeed + "\nrWheelSpeed: " + rWheelSpeed);
         sendMotionCommand(lWheelSpeed,rWheelSpeed);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        final String mode = Utils.getPrefence(this, getString(R.string.pref_commands_mode));
     }
 
     public void sendMotionCommand(int lWheel, int rWheel) {
@@ -478,19 +475,6 @@ public class RemoteControllerActivity extends Activity{
             rWheel = MAX;
         if(rWheel < MIN)
             rWheel = MIN;
-        final int drWheel = rWheel;
-        final int dlWheel = lWheel;
-
-        if(Debug.DEBUG) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    String jsString = (String) jsData.getText();
-                    jsString = jsString.concat("\nRWheel: " + drWheel + "LWheel: " + dlWheel);
-                    jsData.setText(jsString);
-                }
-            });
-        }
 
         if (isConnected()) {
             //mesage consists of a header: VAPT0, followed immediately by the dhb10_com input string and termination character

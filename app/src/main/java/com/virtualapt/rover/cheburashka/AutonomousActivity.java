@@ -62,11 +62,13 @@ public class AutonomousActivity extends Activity {
 
     private Button connectButton;
     private Button switchButton;
+    private Button optionsButton;
+    private Button startLidarButton;
+    private Button dataButton;
+    private Button resetButton;
+    private Button saveButton;
     private Button powerButton;
     private Button captureButton;
-    private Button dataButton;
-    private Button saveButton;
-    private Button startLidarButton;
     private ImageButton stopButton;
     private ImageView bluetoothLogoView;
     private boolean lidarStartFlag = false;
@@ -109,11 +111,13 @@ public class AutonomousActivity extends Activity {
 
         connectButton = (Button)findViewById(R.id.connectButton);
         switchButton = (Button)findViewById(R.id.switchButton);
-        captureButton = (Button)findViewById(R.id.camCaptureButton);
-        powerButton = (Button)findViewById(R.id.camPowerButton);
+        optionsButton = (Button)findViewById(R.id.optionsButton);
         startLidarButton = (Button)findViewById(R.id.startLidarButton);
         dataButton = (Button)findViewById(R.id.dataButton);
+        resetButton = (Button)findViewById(R.id.resetButton);
         saveButton = (Button)findViewById(R.id.saveButton);
+        captureButton = (Button)findViewById(R.id.camCaptureButton);
+        powerButton = (Button)findViewById(R.id.camPowerButton);
         stopButton = (ImageButton)findViewById(R.id.stopButton);
         BTPingData = (TextView)findViewById(R.id.BTPingData);
 
@@ -177,16 +181,114 @@ public class AutonomousActivity extends Activity {
             }
         });
 
+        // If the options button is clicked, cycle through different options menus
+        optionsButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (getString(R.string.lidar_options).equals(optionsButton.getText().toString())) {
+                    optionsButton.setText(R.string.data_options);
+                    startLidarButton.setVisibility(View.GONE);
+                    dataButton.setVisibility(View.VISIBLE);
+                    resetButton.setVisibility(View.VISIBLE);
+                    saveButton.setVisibility(View.VISIBLE);
+                }
+                else if (getString(R.string.data_options).equals(optionsButton.getText().toString())) {
+                    optionsButton.setText(R.string.cam_options);
+                    dataButton.setVisibility(View.GONE);
+                    resetButton.setVisibility(View.GONE);
+                    saveButton.setVisibility(View.GONE);
+                    powerButton.setVisibility(View.VISIBLE);
+                    captureButton.setVisibility(View.VISIBLE);
+                }
+                else if (lidarStartFlag){
+                    optionsButton.setText(R.string.data_options);
+                    powerButton.setVisibility(View.GONE);
+                    captureButton.setVisibility(View.GONE);
+                    dataButton.setVisibility(View.VISIBLE);
+                    resetButton.setVisibility(View.VISIBLE);
+                    saveButton.setVisibility(View.VISIBLE);
+                }
+                else {
+                    optionsButton.setText(R.string.lidar_options);
+                    powerButton.setVisibility(View.GONE);
+                    captureButton.setVisibility(View.GONE);
+                    startLidarButton.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
         startLidarButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 if (isConnected()) {
-                    connector.write("VAPT7".getBytes());
+                    connector.write("VAPT6".getBytes());
                     lidarStartFlag = true;
                 }
                 else {
                     Toast.makeText(AutonomousActivity.this,
                             "Must connect to Bluetooth before starting Lidar", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        dataButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    if (lidarStartFlag) {
+                        connector.write("VAPT7".getBytes());
+                        if (getString(R.string.start_data).equals(dataButton.getText().toString()))
+                            dataButton.setText(R.string.stop_data);
+                        else
+                            dataButton.setText(R.string.start_data);
+                    }
+                    else
+                        Toast.makeText(AutonomousActivity.this,
+                                "Must start Lidar to start data collection", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(AutonomousActivity.this,
+                            "Must connect to Bluetooth before collecting data", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        resetButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    if (lidarStartFlag && getString(R.string.start_data).equals(dataButton.getText().toString())) {
+                        connector.write("VAPT8".getBytes());
+                    }
+                    else
+                        Toast.makeText(AutonomousActivity.this,
+                                "Must start and stop collecting data before resetting", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(AutonomousActivity.this,
+                            "Must connect to Bluetooth before collecting data", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        saveButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if (isConnected()) {
+                    if (lidarStartFlag) {
+                        if (getString(R.string.start_data).equals(dataButton.getText().toString()))
+                            connector.write("VAPT9".getBytes());
+                        else
+                            Toast.makeText(AutonomousActivity.this,
+                                    "Must stop collecting data to save", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                        Toast.makeText(AutonomousActivity.this,
+                                "Must start Lidar to save data", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(AutonomousActivity.this,
+                            "Must connect to Bluetooth before saving data", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -202,13 +304,13 @@ public class AutonomousActivity extends Activity {
                                 "Wait until camera has finished processing previous command",
                                 Toast.LENGTH_SHORT).show();
                     else {
-                        connector.write("VAPT5".getBytes());
+                        connector.write("VAPTA".getBytes());
                         camLock = true;
                         camLockTimer.schedule(new CamLockTask(), 6500);
-                        if (getString(R.string.on).equals(powerButton.getText().toString()))
-                            powerButton.setText(R.string.off);
+                        if (getString(R.string.cam_on).equals(powerButton.getText().toString()))
+                            powerButton.setText(R.string.cam_off);
                         else
-                            powerButton.setText(R.string.on);
+                            powerButton.setText(R.string.cam_on);
                     }
                 }
 
@@ -230,13 +332,13 @@ public class AutonomousActivity extends Activity {
                                 "Wait until camera has finished processing previous command",
                                 Toast.LENGTH_SHORT).show();
                     else {
-                        connector.write("VAPT6".getBytes());
+                        connector.write("VAPTB".getBytes());
                         camLock = true;
                         camLockTimer.schedule(new CamLockTask(), 250);
-                        if (getString(R.string.start).equals(captureButton.getText().toString()))
-                            captureButton.setText(R.string.stop);
+                        if (getString(R.string.cam_capture_start).equals(captureButton.getText().toString()))
+                            captureButton.setText(R.string.cam_capture_stop);
                         else
-                            captureButton.setText(R.string.start);
+                            captureButton.setText(R.string.cam_capture_start);
                     }
                 }
 
@@ -246,41 +348,6 @@ public class AutonomousActivity extends Activity {
                 }
             }
         });
-
-        dataButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                if (isConnected()) {
-                    if (lidarStartFlag)
-                        connector.write("VAPT8".getBytes());
-                    else
-                        Toast.makeText(AutonomousActivity.this,
-                                "Must start Lidar to start data collection", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Toast.makeText(AutonomousActivity.this,
-                            "Must connect to Bluetooth before collecting data", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        saveButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                if (isConnected()) {
-                    if (lidarStartFlag)
-                        connector.write("VAPT9".getBytes());
-                    else
-                        Toast.makeText(AutonomousActivity.this,
-                                "Must start Lidar to save data", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Toast.makeText(AutonomousActivity.this,
-                            "Must connect to Bluetooth before saving data", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
 
         // Create listeners for each seek bar that is triggered when their progress is changed.
         // Send packet with new values to the propeller board each time one is changed.
@@ -473,11 +540,5 @@ public class AutonomousActivity extends Activity {
 
     private boolean isConnected() {
         return ((RCApplication) getApplication()).isConnected();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        final String mode = Utils.getPrefence(this, getString(R.string.pref_commands_mode));
     }
 }
